@@ -19,7 +19,7 @@ title: Techie Tales 🔥
 email: tapai.david.t@gmail.com
 description: >-
   This is the blog of my noteworthy technical journeys and adventures as a developer and techlead.
-baseurl: "/tech-adventures" # the subpath of your site, e.g. /blog
+baseurl: "/techie-tales" # the subpath of your site, e.g. /blog
 url: "dtap001.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: dtap001
 tagline: David Tapai @ Techlead
