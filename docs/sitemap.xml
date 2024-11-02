@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>dtap001.github.io/posts/certs-in-and-outs/</loc>
+<lastmod>2024-11-01T10:32:20+01:00</lastmod>
+</url>
+<url>
+<loc>dtap001.github.io/categories/</loc>
+<lastmod>2024-11-02T11:30:14+01:00</lastmod>
+</url>
+<url>
+<loc>dtap001.github.io/tags/</loc>
+<lastmod>2024-11-02T11:30:14+01:00</lastmod>
+</url>
+<url>
+<loc>dtap001.github.io/archives/</loc>
+<lastmod>2024-11-02T11:30:14+01:00</lastmod>
+</url>
+<url>
+<loc>dtap001.github.io/about/</loc>
+<lastmod>2024-11-02T11:30:14+01:00</lastmod>
+</url>
+<url>
+<loc>dtap001.github.io/</loc>
+</url>
+<url>
+<loc>dtap001.github.io/categories/security/</loc>
+</url>
+<url>
+<loc>dtap001.github.io/categories/webdev/</loc>
+</url>
+</urlset>
