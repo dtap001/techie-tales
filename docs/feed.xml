@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="dtap001.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="dtap001.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2024-11-02T11:30:14+01:00</updated><id>dtap001.github.io/feed.xml</id><title type="html">My Tech Adventures 🔥 - David Tapai @ Techlead</title><subtitle>This is the blog of my noteworthy technical journeys and adventures as a developer and techlead.</subtitle><entry><title type="html">Certificates in and outs</title><link href="dtap001.github.io/posts/certs-in-and-outs/" rel="alternate" type="text/html" title="Certificates in and outs" /><published>2024-11-01T10:32:20+01:00</published><updated>2024-11-01T10:32:20+01:00</updated><id>dtap001.github.io/posts/certs-in-and-outs</id><content type="html" xml:base="dtap001.github.io/posts/certs-in-and-outs/"><![CDATA[<p style="display:block; margin-left:auto; margin-right:auto"><object data="/uml/47af8929fda43be4226607adf0b32d50.svg" type="image/svg+xml" class="plantuml"></object></p>
+<h2 id="what-is-this">What is this?</h2>
+
+<div class="quote">
+  
+  I have only made this letter longer because
+  I have not had the time to make it shorter.
+<span class="quoteAttribution"> &nbsp;&ndash; From <a href="https://en.wikipedia.org/wiki/Lettres_provinciales" rel="nofollow" target="_blank">Blaise Pascal, in Lettres provinciales</a></span>
+
+  
+</div>
+
+<p>My humble summary regarding every important aspect of the certificates that a developer likely will encounter.</p>
+
+<h3 id="what-is-a-certificate">What is a certificate?</h3>
+<blockquote>
+
+  <p>A <strong>certificate</strong> or <strong>digital certificate</strong> is a unique, <a href="https://www.computerhope.com/jargon/d/digisig.htm">digitally signed</a> document which authoritatively identifies the identity of an individual or organization. Using <a href="https://www.computerhope.com/jargon/p/pkc.htm">public key cryptography</a>, its authenticity can be verified to ensure that the software or website you are using is legitimate. On the Internet, a certificate is signed by a trusted <a href="https://www.computerhope.com/jargon/c/certificate-authority.htm">CA</a> (certificate authority), and verified with the authority’s public key. The decrypted certificate contains a verified public key of the certificate holder (website operator), with which encrypted <a href="https://www.computerhope.com/jargon/h/http.htm#https">HTTPS</a> communications can be established.</p>
+</blockquote>
+
+<hr />
+
+<h2 id="public-key-cryptography-or-asymmetric-cryptography">Public-key cryptography or Asymmetric cryptography</h2>
+
+<h3 id="public-key-pair-generation">Public Key Pair Generation</h3>
+
+<ul>
+  <li>RSA -&gt; using big prime numbers and based on factoring trap door function, using big keys to provide security</li>
+  <li>ECC (Elliptic curve) -&gt; based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -&gt; using shorter keys due to it</li>
+  <li>DSA -&gt; using discrete logaritmic propertyes and private key generated from the content that we want to sign -&gt; used for ensuring file integrity and verification</li>
+</ul>
+
+<h4 id="flow">Flow</h4>
+
+<p><img src="/assets/certs-in-and-outs/asymetrics-flow.jpg" alt="asymetrics flow" style="display:block; margin-left:auto; margin-right:auto" /></p>
+
+<p>In very oversimplified manner this happens</p>
+
+<div class="language-ts highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre> <span class="kd">const</span> <span class="nx">privateKey</span> <span class="o">=</span> <span class="nf">randomString</span><span class="p">();</span>
+ <span class="kd">const</span> <span class="nx">publicKey</span> <span class="o">=</span> <span class="nf">generatePublicKey</span><span class="p">(</span><span class="nx">privateKey</span><span class="p">);</span>
+ <span class="kd">const</span> <span class="nx">plainMessage</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">Hello Mr Bug!🐜</span><span class="dl">'</span><span class="p">;</span>
+ 
+ <span class="kd">const</span> <span class="nx">encryptedMessage</span> <span class="o">=</span> <span class="nf">encrypt</span><span class="p">(</span><span class="nx">publicKey</span><span class="p">,</span> <span class="nx">plainMessage</span><span class="p">);</span>
+ <span class="kd">const</span> <span class="nx">decryptedMessage</span> <span class="o">=</span> <span class="nf">decrypt</span><span class="p">(</span><span class="nx">encryptedMessage</span><span class="p">,</span> <span class="nx">privateKey</span><span class="p">);</span>
+ <span class="nx">console</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="nx">decryptedMessage</span><span class="p">);</span> <span class="c1">//'Hello Mr Bug!🐜'</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<hr />
+
+<p><img src="/assets/certs-in-and-outs/private-public-key.jpg" alt="certs-in-and-outs" /></p>
+
+<hr />
+
+<h2 id="public-key-infrastructure-pki">Public-Key Infrastructure (PKI)</h2>
+
+<blockquote>
+  <p>[!info] How the to validate the cert? 😵</p>
+</blockquote>
+
+<h3 id="certificate-authorities-verification-authority">Certificate Authorities (Verification Authority)</h3>
+
+<ul>
+  <li>A company that is considered trustworthy and produces digital certificates for other individuals and
+companies (i.e. subjects) bearing that subject’s public key</li>
+</ul>
+
+<h4 id="tasks">Tasks</h4>
+
+<ul>
+  <li>issues digital certificates;</li>
+  <li>helps establish trust between communicating entities over the internet;</li>
+  <li>verifies domain names and organizations to validate their identities; and</li>
+  <li>maintains <a href="https://www.techtarget.com/searchsecurity/definition/Certificate-Revocation-List">certificate revocation lists</a>.⛔</li>
+</ul>
+
+<p><img src="/assets/certs-in-and-outs/Pasted image 20230712170056.png" alt="certs-in-and-outs" /></p>
+
+<h3 id="chain-of-thrust">Chain of thrust</h3>
+
+<blockquote>
+  <p>Hierarchy of certificates is used to verify the validity of a certificate’s issuer. This hierarchy is known as a <em>chain of trust</em>. In a chain of trust, certificates are issued and signed by certificates that live higher up in the hierarchy.</p>
+</blockquote>
+
+<h4 id="contains-three-main-parts">Contains three main parts</h4>
+
+<h4 id="trust-anchor">Trust Anchor</h4>
+
+<ul>
+  <li>A public cert key named as CA cert which is trusted by both of the communicating parties</li>
+</ul>
+
+<h4 id="intermediete-cert">Intermediete Cert</h4>
+
+<ul>
+  <li>you cannot issue new cert from thrusted public CA certs since you need a new layer</li>
+  <li>extra security to provide validation for the CA cert</li>
+  <li>cheaper then issueing new CA cert for every need</li>
+</ul>
+
+<h4 id="end-entity-cert--leaf-cert">End Entity Cert / Leaf Cert</h4>
+
+<ul>
+  <li>no other cert can be above it</li>
+  <li>represents the end entity of the chain</li>
+</ul>
+
+<p>What is CSR (Certificate Signing Request)?</p>
+<blockquote>
+  <p>It is a request which sent to the CA to issue a new certificate with the given properties</p>
+</blockquote>
+
+<h5 id="what-happens">What happens?</h5>
+
+<ul>
+  <li>public key pair is generated</li>
+  <li>requested cert field are asked from the user</li>
+  <li>CSR generated and contains:
+    <ul>
+      <li>public key</li>
+      <li>data fields are included with the input from the user</li>
+    </ul>
+  </li>
+</ul>
+
+<h4 id="example">Example</h4>
+
+<p>Decoder <a href="https://ssltools.godaddy.com/views/csrDecoder">https://ssltools.godaddy.com/views/csrDecoder</a></p>
+
+<p><img src="/assets/certs-in-and-outs/Pasted image 20230712181327.png" alt="certs-in-and-outs" /></p>
+
+<hr />
+
+<h2 id="ok-but-how-does-everyone-understands-the-certs">Ok but how does everyone understands the certs?</h2>
+
+<blockquote>
+  <p>X.509 for the win! 🏆
+This standard make possible to  that information within a digital certificate are all placed in the same location and in the same order, which makes it possible for all kinds of certificates to be shared across organizations</p>
+
+</blockquote>
+
+<h3 id="parts">Parts</h3>
+
+<h4 id="data-section">Data Section</h4>
+
+<p><img src="/assets/certs-in-and-outs/Pasted image 20230712164200.png" alt="certs-in-and-outs" /></p>
+
+<h4 id="signature-section">Signature Section</h4>
+
+<ul>
+  <li>The cipher algorithm – the algorithm used by the issuer to create a digital signature</li>
+  <li>The digital signature for the CA – a hash of all the information in the certificate encrypted with the CA private key
+<img src="/assets/certs-in-and-outs/Pasted image 20230712170609.png" alt="certs-in-and-outs" /></li>
+</ul>
+
+<h2 id="certificate-formats">Certificate formats</h2>
+
+<ul>
+  <li>Binary
+  • .DER (Distinguished Encoding Rules)
+      • A single binary certificate, platform-independent format, the default format for most browsers
+      • Use: Used for Certificate Requests, which are always DER-encoded and then base64-encoded
+  • PKCS#12 (Public-Key Cryptographic Standards)
+      • One or more certificates packed together, password-encrypted
+      • Use: When the CA wants to ship a package confidentially that contains the private key</li>
+  <li>Base64 (ASCII)
+  • .PEM
+      • Default format for OpenSSL. Suitable for sending files as text between systems
+      • Prefixed with a “–BEGIN…” line
+      • Use: When making a Certificate Request in an email
+  • PKCS#7
+      • One or more certificate packaged together but not signed or encrypted
+      • Use: When the CA wants to deliver multiple certificates to a destination</li>
+</ul>
+
+<p><img src="/assets/certs-in-and-outs/Pasted image 20230712170647.png" alt="certs-in-and-outs" /></p>
+
+<hr />
+
+<h2 id="cert-validity-scopes">Cert Validity Scopes</h2>
+
+<p>Single Domain Certs -&gt; for single domain
+Wildcard SSL Certs -&gt; valid for any subdomain
+Multi-Domain SSL Cert -&gt; valid for multiple domain</p>
+
+<hr />
+
+<h3 id="cert-validation-levels">Cert Validation Levels</h3>
+
+<p>Domain Validation -&gt; dns record or https challange (lets encrypt)
+Organization Validation -&gt; CA will contact the organization and will check every detail of the company that will be included in the cert
+Extended Validation -&gt; CA will make full background check of the organization</p>
+
+<hr />
+
+<h2 id="ssl--ssl">SSL / SSL</h2>
+
+<p>TLS, short for Transport Layer Security, and <a href="https://kinsta.com/knowledge/base/how-ssl-works/">SSL</a>, short for Secure Socket Layers, are both cryptographic protocols that encrypt data and authenticate a connection when moving data on the Internet.</p>
+
+<blockquote>
+  <p>Well, <strong>TLS is actually just a more recent version of SSL</strong></p>
+</blockquote>
+
+<ul>
+  <li>SSL 1.0 – never publicly released due to security issues.</li>
+  <li>SSL 2.0 – released in 1995. Deprecated in 2011. Has known security issues.</li>
+  <li>SSL 3.0 – released in 1996. Deprecated in 2015. Has known security issues.</li>
+  <li>TLS 1.0 – released in 1999 as an upgrade to SSL 3.0. Planned deprecation in 2020.</li>
+  <li>TLS 1.1 – released in 2006. Planned deprecation in 2020.</li>
+  <li>TLS 1.2 – released in 2008.</li>
+  <li>TLS 1.3 – released in 2018.</li>
+</ul>
+
+<blockquote>
+  <p>Why do we calling the certs SSL cert?
+The reason why most people still refer to them as SSL certificates is basically a branding issue. Most major certificate providers still refer to certificates as SSL certificates, which is why the naming convention persists.</p>
+</blockquote>
+
+<p>In reality, all the “SSL Certificates” that you see advertised are really <strong>SSL/TLS Certificates</strong></p>
+
+<blockquote>
+  <p>What is HTTP<strong>S</strong>?!
+This is also where HTTPS comes in (HTTPS stands for “HTTP over SSL/TLS”).</p>
+</blockquote>]]></content><author><name></name></author><category term="security" /><category term="webdev" /><summary type="html"><![CDATA[]]></summary></entry></feed>

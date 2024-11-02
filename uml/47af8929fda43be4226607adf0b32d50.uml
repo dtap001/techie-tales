@@ -1,0 +1,31 @@
+@startuml
+
+@startuml
+actor Client
+actor Server
+
+Client -> Server: Initiate Key Exchange
+activate Server
+Server -> Client: Send Public Key
+deactivate Server
+
+Client -> Client: Generate Session Key
+Client -> Server: Send Encrypted Session Key
+activate Server
+Server -> Server: Decrypt Session Key
+deactivate Server
+
+Client -> Server: Send Encrypted Data
+activate Server
+Server -> Server: Decrypt Data
+Server -> Client: Send Acknowledgment
+deactivate Server
+
+Client -> Server: Send Further Encrypted Data
+activate Server
+Server -> Server: Decrypt Further Data
+Server -> Client: Send Final Acknowledgment
+deactivate Server
+@enduml
+
+@enduml
