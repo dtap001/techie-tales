@@ -21,9 +21,8 @@ description: >-
   This is the blog of my noteworthy technical journeys and adventures as a developer and techlead.
 baseurl: "/tech-adventures" # the subpath of your site, e.g. /blog
 url: "dtap001.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-github_username:  dtap001
+github_username: dtap001
 tagline: A text-focused Jekyll theme # it will display as the subtitle
-
 
 github:
   username: github_username # change to your GitHub username
@@ -150,7 +149,6 @@ pwa:
 paginate: 10
 
 # The base URL of your site
-baseurl: ""
 
 # ------------ The following options are not recommended to be modified ------------------
 
