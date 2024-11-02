@@ -4,49 +4,13 @@ title:  "Certificates in and outs"
 date:   2024-11-01 10:32:20 +0100
 categories: security webdev
 ---
-{% plantuml %}
-@startuml
-actor Client
-actor Server
 
-Client -> Server: Initiate Key Exchange
-activate Server
-Server -> Client: Send Public Key
-deactivate Server
-
-Client -> Client: Generate Session Key
-Client -> Server: Send Encrypted Session Key
-activate Server
-Server -> Server: Decrypt Session Key
-deactivate Server
-
-Client -> Server: Send Encrypted Data
-activate Server
-Server -> Server: Decrypt Data
-Server -> Client: Send Acknowledgment
-deactivate Server
-
-Client -> Server: Send Further Encrypted Data
-activate Server
-Server -> Server: Decrypt Further Data
-Server -> Client: Send Final Acknowledgment
-deactivate Server
-@enduml
-{% endplantuml %}{:style="display:block; margin-left:auto; margin-right:auto"}
-## What is this?
-
-{% quote cite="Blaise Pascal, in Lettres provinciales"
-   url="https://en.wikipedia.org/wiki/Lettres_provinciales"
-%}
-  I have only made this letter longer because
-  I have not had the time to make it shorter.
-{% endquote %}
-My humble summary regarding every important aspect of the certificates that a developer likely will encounter.
+This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter.
 
 ### What is a certificate?
 >
 > A **certificate** or **digital certificate** is a unique, [digitally signed](https://www.computerhope.com/jargon/d/digisig.htm) document which authoritatively identifies the identity of an individual or organization. Using [public key cryptography](https://www.computerhope.com/jargon/p/pkc.htm), its authenticity can be verified to ensure that the software or website you are using is legitimate. On the Internet, a certificate is signed by a trusted [CA](https://www.computerhope.com/jargon/c/certificate-authority.htm) (certificate authority), and verified with the authority's public key. The decrypted certificate contains a verified public key of the certificate holder (website operator), with which encrypted [HTTPS](https://www.computerhope.com/jargon/h/http.htm#https) communications can be established.
-
+{: .prompt-info }
 ---
 
 ## Public-key cryptography or Asymmetric cryptography
@@ -57,9 +21,9 @@ My humble summary regarding every important aspect of the certificates that a de
 - ECC (Elliptic curve) -> based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -> using shorter keys due to it
 - DSA -> using discrete logaritmic propertyes and private key generated from the content that we want to sign -> used for ensuring file integrity and verification
 
-#### Flow
+#### Communication Flow
 
-![asymetrics flow]({{ site.baseurl }}/assets/certs-in-and-outs/asymetrics-flow.jpg){:style="display:block; margin-left:auto; margin-right:auto"}
+![asymetrics flow](/assets/certs-in-and-outs/asymetrics-flow.jpg){:style="display:block; margin-left:auto; margin-right:auto"}
 
 In very oversimplified manner this happens
 
@@ -75,13 +39,14 @@ In very oversimplified manner this happens
 
 ---
 
-![certs-in-and-outs]({{ site.baseurl }}/assets/certs-in-and-outs/private-public-key.jpg)
+![certs-in-and-outs](/assets/certs-in-and-outs/private-public-key.jpg)
 
 ---
 
 ## Public-Key Infrastructure (PKI)
 
-> [!info] How the to validate the cert? 😵
+> How the heck validate the cert? 😵
+{: .prompt-tip }
 
 ### Certificate Authorities (Verification Authority)
 
@@ -95,11 +60,12 @@ companies (i.e. subjects) bearing that subject’s public key
 - verifies domain names and organizations to validate their identities; and
 - maintains [certificate revocation lists](https://www.techtarget.com/searchsecurity/definition/Certificate-Revocation-List).⛔
 
-![certs-in-and-outs]({{ site.baseurl }}/assets/certs-in-and-outs/Pasted image 20230712170056.png)
+![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170056.png)
 
 ### Chain of thrust
 
 > Hierarchy of certificates is used to verify the validity of a certificate’s issuer. This hierarchy is known as a _chain of trust_. In a chain of trust, certificates are issued and signed by certificates that live higher up in the hierarchy.
+{: .prompt-info }
 
 #### Contains three main parts
 
@@ -120,6 +86,7 @@ companies (i.e. subjects) bearing that subject’s public key
 
 What is CSR (Certificate Signing Request)?
 > It is a request which sent to the CA to issue a new certificate with the given properties
+{: .prompt-info }
 
 ##### What happens?
 
@@ -133,63 +100,77 @@ What is CSR (Certificate Signing Request)?
 
 Decoder <https://ssltools.godaddy.com/views/csrDecoder>
 
-![certs-in-and-outs]({{ site.baseurl }}/assets/certs-in-and-outs/Pasted image 20230712181327.png)
+![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712181327.png)
 
 ---
 
-## Ok but how does everyone understands the certs?
+## X.509
 
-> X.509 for the win! 🏆
+> **Ok but how does everyone understands the certs?**
+>
+##### X.509 for the win! 🏆
+>
 >This standard make possible to  that information within a digital certificate are all placed in the same location and in the same order, which makes it possible for all kinds of certificates to be shared across organizations
 >
+{: .prompt-tip }
 
-### Parts
+### Parts 🎁
 
 #### Data Section
 
-![certs-in-and-outs]({{ site.baseurl }}/assets/certs-in-and-outs/Pasted image 20230712164200.png)
+![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712164200.png)
 
 #### Signature Section
 
 - The cipher algorithm – the algorithm used by the issuer to create a digital signature
 - The digital signature for the CA – a hash of all the information in the certificate encrypted with the CA private key
-![certs-in-and-outs]({{ site.baseurl }}/assets/certs-in-and-outs/Pasted image 20230712170609.png)
 
-## Certificate formats
+![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170609.png)
 
-- Binary
-    • .DER (Distinguished Encoding Rules)
-        • A single binary certificate, platform-independent format, the default format for most browsers
-        • Use: Used for Certificate Requests, which are always DER-encoded and then base64-encoded
-    • PKCS#12 (Public-Key Cryptographic Standards)
-        • One or more certificates packed together, password-encrypted
-        • Use: When the CA wants to ship a package confidentially that contains the private key
-- Base64 (ASCII)
-    • .PEM
-        • Default format for OpenSSL. Suitable for sending files as text between systems
-        • Prefixed with a “--BEGIN…” line
-        • Use: When making a Certificate Request in an email
-    • PKCS#7
-        • One or more certificate packaged together but not signed or encrypted
-        • Use: When the CA wants to deliver multiple certificates to a destination
+## Certificate formats ☘️
 
-![certs-in-and-outs]({{ site.baseurl }}/assets/certs-in-and-outs/Pasted image 20230712170647.png)
+### Binary
+
+#### .DER (Distinguished Encoding Rules)
+
+- A single binary certificate, platform-independent format, the default format for most browsers
+- Use: Used for Certificate Requests, which are always DER-encoded and then base64-encoded
+
+#### PKCS#12 (Public-Key Cryptographic Standards)
+
+- One or more certificates packed together, password-encrypted
+- Use: When the CA wants to ship a package confidentially that contains the private key
+
+### Base64 (ASCII)
+
+#### .PEM
+
+- Default format for OpenSSL. Suitable for sending files as text between systems
+- Prefixed with a “--BEGIN…” line
+- Use: When making a Certificate Request in an email
+
+#### PKCS#7
+
+- One or more certificate packaged together but not signed or encrypted
+- Use: When the CA wants to deliver multiple certificates to a destination
+
+![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170647.png)
 
 ---
 
 ## Cert Validity Scopes
 
-Single Domain Certs -> for single domain
-Wildcard SSL Certs -> valid for any subdomain
-Multi-Domain SSL Cert -> valid for multiple domain
+- Single Domain Certs -> for single domain
+- Wildcard SSL Certs -> valid for any subdomain
+- Multi-Domain SSL Cert -> valid for multiple domain
 
 ---
 
 ### Cert Validation Levels
 
-Domain Validation -> dns record or https challange (lets encrypt)
-Organization Validation -> CA will contact the organization and will check every detail of the company that will be included in the cert
-Extended Validation -> CA will make full background check of the organization
+- Domain Validation -> dns record or https challange (lets encrypt)
+- Organization Validation -> CA will contact the organization and will check every detail of the company that will be included in the cert
+- Extended Validation -> CA will make full background check of the organization
 
 ---
 
@@ -207,10 +188,12 @@ TLS, short for Transport Layer Security, and [SSL](https://kinsta.com/knowledge/
 - TLS 1.2 – released in 2008.
 - TLS 1.3 – released in 2018.
 
-> Why do we calling the certs SSL cert?
+> **Why do we calling the certs SSL cert?**
 >The reason why most people still refer to them as SSL certificates is basically a branding issue. Most major certificate providers still refer to certificates as SSL certificates, which is why the naming convention persists.
+{: .prompt-info }
 
 In reality, all the “SSL Certificates” that you see advertised are really **SSL/TLS Certificates**
 
 > What is HTTP**S**?!
 >This is also where HTTPS comes in (HTTPS stands for “HTTP over SSL/TLS”).
+{: .prompt-tip }

@@ -15,14 +15,14 @@ timezone:
 # ↓ --------------------------
 destination: docs
 
-title: My Tech Adventures 🔥 - David Tapai @ Techlead
+title: Techie Tales 🔥
 email: tapai.david.t@gmail.com
 description: >-
   This is the blog of my noteworthy technical journeys and adventures as a developer and techlead.
-baseurl: "tech-adventures" # the subpath of your site, e.g. /blog
+baseurl: "/tech-adventures" # the subpath of your site, e.g. /blog
 url: "dtap001.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: dtap001
-tagline: A text-focused Jekyll theme # it will display as the subtitle
+tagline: David Tapai @ Techlead
 
 github:
   username: dtap001 # change to your GitHub username
@@ -93,7 +93,7 @@ theme_mode: # [light | dark]
 cdn:
 
 # the avatar on sidebar, support local or CORS resources
-avatar:
+avatar: "assets/profile.jpeg"
 
 # The URL of the site-wide social preview image used in SEO `og:image` meta tag.
 # It can be overridden by a customized `page.image` in front matter.
