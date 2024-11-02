@@ -2,4 +2,4 @@ User-agent: *
 
 Disallow: /norobots/
 
-Sitemap: dtap001.github.io/sitemap.xml
+Sitemap: dtap001.github.io/tech-adventures/sitemap.xml
