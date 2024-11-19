@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="190px" preserveAspectRatio="none" style="width:486px;height:190px;background:#000000;" version="1.1" viewBox="0 0 486 190" width="486px" zoomAndPan="magnify"><defs/><g><rect fill="#190C1A" height="1" style="stroke: #190C1A; stroke-width: 1.0;" width="1" x="0" y="0"/><rect fill="#33FF02" height="21.2969" style="stroke: #33FF02; stroke-width: 1.0;" width="480" x="5" y="5"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="478" x="6" y="20">[From d9e03392dbacf07083681bc6e9ee8d10.uml (line 10) ]</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="0" x="10" y="40.2969"/><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="79" x="5" y="56.5938">@startuml</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="84" x="5" y="72.8906">actor Alice</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="76" x="5" y="89.1875">actor Bob</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="0" x="10" y="105.4844"/><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="242" x="5" y="121.7813">rectangle "Alice" as AliceBox {</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="327" x="25" y="138.0781">Alice -&gt; Alice_Public : "Send copy to Bob"</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="0" x="25" y="154.375"/><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="290" x="25" y="170.6719">rectangle "A's Public" as Alice_Public</text><text fill="#FF0000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="357" x="10" y="186.9688">This element (Alice_Public) is already defined</text><!--MD5=[8c86f266b84c1ea7829b93f1fcbea969]
+@startuml
+actor Alice
+actor Bob
+
+rectangle "Alice" as AliceBox {
+    Alice -> Alice_Public : "Send copy to Bob"
+    
+    rectangle "A's Public" as Alice_Public
+    rectangle "A's Private" as Alice_Private
+    rectangle "Decrypt Function" as DecryptFunc
+    rectangle "Data" as Alice_Data
+}
+
+rectangle "Bob" as BobBox {
+    rectangle "Encrypt Function" as EncryptFunc
+    rectangle "A's Public (Copy)" as Bob_Public
+    rectangle "Data" as Bob_Data
+}
+
+Alice_Public -[hidden]-> Bob_Public : " "
+
+Alice_Private - -> DecryptFunc : "A's Private Key"
+DecryptFunc - -> Alice_Data : "Decrypted Data"
+
+Bob -> EncryptFunc : "Encrypt Data"
+EncryptFunc - -> Bob_Data : "Encrypted Data"
+EncryptFunc - -> Bob_Public : "Use A's Public Key (Copy)"
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

@@ -5,7 +5,8 @@ date:   2024-11-01 10:32:20 +0100
 categories: security webdev
 ---
 
-This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic.
+> This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic.
+{: .prompt-info }
 
 ## Some basics
 
@@ -23,11 +24,11 @@ Ok, but what is it good for❓
 
 Usually hashes are sent along side with a payload/data to determine if it was tempered after the sender initially sent it to the client. But the are also used for authentication when the user's password wont be stored in the database just the **salt**ed hash itself.
 
-**Salting** is the process of concatenating an already known propery of the user to the password and hash it together. This is important to prevent [rainbow table attacks](https://www.beyondidentity.com/glossary/rainbow-table-attack) for leaked databases which contains the hashes of the user passwords.
+**Salting 🧂** is the process of concatenating an already known propery of the user to the password and hash it together. This is important to prevent [rainbow table attacks](https://www.beyondidentity.com/glossary/rainbow-table-attack) for leaked databases which contains the hashes of the user passwords.
 
 For example each certificate contains the hash fingerprint of itself and this way when client recieves it, then it can be hashed again and see if the fingerprints are matching.
 
-**Peppering** is one more additional layer of security when storing hash. It is basically doing one more round of hashing but now using some shared secret which wil be the same for all of the entries in the database.
+**Peppering🌶️** is one more additional layer of security when storing hash. It is basically doing one more round of hashing but now using some shared secret which will be the same for all of the entries in the database.
 
 #### Hashing algorithms
 
@@ -54,18 +55,18 @@ There are multiple algorithms which is used for hashing, but they have differnet
 
 #### Hashing best practices 💡
 
-Never store password in the database plaintext, use a hashed and salt&peppered string preferebly using at least sha2 with multiple iterarations/work factors. This way the
-cracking process itself wont worth for the attacker.
+**Never store password in the database plaintext, use a hashed and salt&peppered string preferebly using at least sha2 with multiple iterarations/work factors. This way the
+cracking process itself wont worth for the attacker.**
 
 ---
 
-### What is a certificate?
+### What is a certificate 🎫?
 
 > A **certificate** or **digital certificate** is a unique, [digitally signed](https://www.computerhope.com/jargon/d/digisig.htm) document which authoritatively identifies the identity of an individual or organization. Using [public key cryptography](https://www.computerhope.com/jargon/p/pkc.htm), its authenticity can be verified to ensure that the software or website you are using is legitimate. On the Internet, a certificate is signed by a trusted [CA](https://www.computerhope.com/jargon/c/certificate-authority.htm) (certificate authority), and verified with the authority's public key. The decrypted certificate contains a verified public key of the certificate holder (website operator), with which encrypted [HTTPS](https://www.computerhope.com/jargon/h/http.htm#https) communications can be established.
 [source](https://www.computerhope.com/jargon/c/certific.htm)
 {: .prompt-info }
 
-So basically the certificate is a unique generated chain of characters in a specific format which can be validated by a third party (CA) therefore can be used for authentication and authorization.
+So basically the certificate is a unique generated chain of characters in a specific format which can be validated by a third party (CA) therefore can be used for authentication/authorization and prove the integrity of the document.
 
 ## Use cases
 
@@ -75,26 +76,184 @@ Certificates are used for:
 - prooving access rights for a server -> mutual tls (mTLS)
 - proving integrity of a document -> digitally signed pdf
 
-## How to use certificate to secure communication: Public-key cryptography or Asymmetric cryptography
+## How to use certificate to secure communication?
+>
+> The smart people invented a system which relies on certificates to secyre the data using **public-key cryptography** or in another name -> **Asymmetric cryptography**
+{: .prompt-info }
 
-### Public Key Pair Generation
+### Generate the public private keypair
+
+#### Algorithms for generation
+
+The certificates usually generated with one of the following algorythms and usually one of the previously used hashing algorythms is also used
 
 - RSA -> using big prime numbers and based on factoring trap door function, using big keys to provide security
-- ECC (Elliptic curve) -> based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -> using shorter keys due to it
+- ECDSA (Elliptic curve) -> based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -> using shorter keys due to it
 - DSA -> using discrete logaritmic properties and private key generated from the content that we want to sign -> used for ensuring file integrity and verification
 
-#### Communication Flow
+#### How to generate
 
-{% plantuml %}
-@startuml
-actor Alice
-actor Bob
+First generate the private key
 
-@enduml
+```bash
+openssl genpkey -algorithm RSA -out private_key.pem -pkeyopt rsa_keygen_bits:2048
+```
 
-{% endplantuml %}
+Generate the public key
 
-![asymetrics flow](/assets/certs-in-and-outs/asymetrics-flow.jpg){:style="display:block; margin-left:auto; margin-right:auto"}
+```bash
+openssl rsa -in private_key.pem -pubout -out public_key.pem
+```
+
+Raw content:
+
+```text
+       │ File: private_key.pem
+───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ -----BEGIN PRIVATE KEY-----
+   2   │ MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDNSq1wtI4exogf
+   3   │ REWOvSkYUVAIva6qblvCJ1heOEyllek+RKGPQI4Iw/bgAg8UFb2GqmO6Aci8aT7r
+   4   │ e0+acZI1OFKX1pXpSJ0mQ7tLuDhCoM/LYr+1vxqHaq/T/u+8jLNds2Iw20rhfbnD
+   5   │ huJ/cYCw5N/8qdxsmph7tuvwpyDl6pAV7YpxE4RZVld7SAxQtAjoW1TSgGRFDkiu
+   6   │ DKMwGur8Y4zz+ZeJuf93gBt0/St/IGWWlh1vXGoSI60yikOZCKc8lN++kYlJ846y
+   7   │ p7G2Gqang6EKs3N90IbfCFhkwl65ZBddhUVbQD6aSl/PfN3T2plek8H3BxYAfOus
+   8   │ qpfzfA29AgMBAAECggEAAwfYsqK/vF2S8d84pahOPIEqzM48D2EMsruQ9uce3ozt
+   9   │ ghFST0KVNjTqZpkxLss5Xo0SZtMS6xEksCZEYRPPJED+Gya8VNLRGxkB4VbJYdZs
+  10   │ 6uQ8z0qQcjJVgSwwzthG55m319/M5bJM9UF/A4Gh9DqUwe6iBepsWNs09XsKJcq/
+  11   │ a4AdnVGrBN+t1dCVCK+rGglKV0mAZyIDERK5LAxDG6UoO9i1UodA8ofGg2WHRBqN
+  12   │ eDoc5/XWEjdAUaHPhgpGIpjtfHuXcKzlLlsLBVyJ5t8A/MQgAzwYbkuiL+R6QyFZ
+  13   │ Uj751bMNNstNhSQrN8PwxHOBBS43EmqRp+DiUDlPoQKBgQDq1DOgX9qyqBAqvqJ0
+  14   │ C/A3vY4ESLybUZBbqQt48H3TivRc+ZmY5Cdn+UjNAKL7lIiWCz2H9wEhZP7XWZmz
+  15   │ ZYS6NX8j1QOfseuqNJyV7EOW3ddtARdRpf6gTSCk8SSEn+gBPh748iVvHYI4+BZm
+  16   │ pMf5F3CrLaWjDUI/q0r2Ifk8kQKBgQDfzMOKsknL3DgYfyY67SEDH1ILMUxEnabi
+  17   │ z1iuvbZzrjjYIUlTpyPdAe14vrGYIjT2oYzweRYVMq5q+ugODsohc9GT2WSnxTBI
+  18   │ LhM2JC9eQ/FNGmHYt+g3K1sSK93YFiXW/ZWj8lRiP6ent1VvqQLfrZj5w6EmlBGB
+  19   │ 8q2BgjsEbQKBgFbm8rgN4QQul9UJuVrStDIcjvrc5Bdihta05075SMdJbAcgQ4xG
+  20   │ GqMqqJtc+fO6UxWb0UiIyz1Nf9W4Dd5K2mSCuatMAExP7pONZslApv6k2D05oySP
+  21   │ FnzCLit8JfSCrLwQ/itIiTvmorNsc/XGU07GMubWPK7rkDG5tUMC7ZZRAoGBANpc
+  22   │ J86D9oz56aG9LcgA5lztildxWkD4sYRLWvPkFsj4DG6Uy77bLZrN7q4JIa6WcabS
+  23   │ KXnYKzuzn4qyFQjiVUYegzYGvrcTJvDGQ+hnlfAbyqy4ORADIIfzvYAVXPchZPpH
+  24   │ omG8Z6kVArgZoTq5ZRxpfQD1Z58EibCI39GlB4BhAoGAML+iU0yUj5FZs/X8vLPx
+  25   │ ZJwuZU+7GHM1HbJXhH/BZY0poBzBNFjKj8mu5l36T4x+EZ6ySkmfJ5isEdXcKO6M
+  26   │ JFukU8YHUMWCN/YZpNg/92XNoB5PtUFj/bsEBHAu1GZzXgcjoA84rcgvLQq+4Ufb
+  27   │ 8xQKC3zQmqhkeq3GewThg48=
+  28   │ -----END PRIVATE KEY-----
+───────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: public_key.pem
+───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ -----BEGIN PUBLIC KEY-----
+   2   │ MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzUqtcLSOHsaIH0RFjr0p
+   3   │ GFFQCL2uqm5bwidYXjhMpZXpPkShj0COCMP24AIPFBW9hqpjugHIvGk+63tPmnGS
+   4   │ NThSl9aV6UidJkO7S7g4QqDPy2K/tb8ah2qv0/7vvIyzXbNiMNtK4X25w4bif3GA
+   5   │ sOTf/KncbJqYe7br8Kcg5eqQFe2KcROEWVZXe0gMULQI6FtU0oBkRQ5IrgyjMBrq
+   6   │ /GOM8/mXibn/d4AbdP0rfyBllpYdb1xqEiOtMopDmQinPJTfvpGJSfOOsqexthqm
+   7   │ p4OhCrNzfdCG3whYZMJeuWQXXYVFW0A+mkpfz3zd09qZXpPB9wcWAHzrrKqX83wN
+   8   │ vQIDAQAB
+   9   │ -----END PUBLIC KEY-----
+   ```
+
+Dissect it with openssl:
+```bash
+openssl pkey -in private_key.pem -text -noout
+```
+```text
+Private-Key: (2048 bit, 2 primes)
+modulus:
+    00:cd:4a:ad:70:b4:8e:1e:c6:88:1f:44:45:8e:bd:
+    29:18:51:50:08:bd:ae:aa:6e:5b:c2:27:58:5e:38:
+    4c:a5:95:e9:3e:44:a1:8f:40:8e:08:c3:f6:e0:02:
+    0f:14:15:bd:86:aa:63:ba:01:c8:bc:69:3e:eb:7b:
+    4f:9a:71:92:35:38:52:97:d6:95:e9:48:9d:26:43:
+    bb:4b:b8:38:42:a0:cf:cb:62:bf:b5:bf:1a:87:6a:
+    af:d3:fe:ef:bc:8c:b3:5d:b3:62:30:db:4a:e1:7d:
+    b9:c3:86:e2:7f:71:80:b0:e4:df:fc:a9:dc:6c:9a:
+    98:7b:b6:eb:f0:a7:20:e5:ea:90:15:ed:8a:71:13:
+    84:59:56:57:7b:48:0c:50:b4:08:e8:5b:54:d2:80:
+    64:45:0e:48:ae:0c:a3:30:1a:ea:fc:63:8c:f3:f9:
+    97:89:b9:ff:77:80:1b:74:fd:2b:7f:20:65:96:96:
+    1d:6f:5c:6a:12:23:ad:32:8a:43:99:08:a7:3c:94:
+    df:be:91:89:49:f3:8e:b2:a7:b1:b6:1a:a6:a7:83:
+    a1:0a:b3:73:7d:d0:86:df:08:58:64:c2:5e:b9:64:
+    17:5d:85:45:5b:40:3e:9a:4a:5f:cf:7c:dd:d3:da:
+    99:5e:93:c1:f7:07:16:00:7c:eb:ac:aa:97:f3:7c:
+    0d:bd
+publicExponent: 65537 (0x10001)
+privateExponent:
+    03:07:d8:b2:a2:bf:bc:5d:92:f1:df:38:a5:a8:4e:
+    3c:81:2a:cc:ce:3c:0f:61:0c:b2:bb:90:f6:e7:1e:
+    de:8c:ed:82:11:52:4f:42:95:36:34:ea:66:99:31:
+    2e:cb:39:5e:8d:12:66:d3:12:eb:11:24:b0:26:44:
+    61:13:cf:24:40:fe:1b:26:bc:54:d2:d1:1b:19:01:
+    e1:56:c9:61:d6:6c:ea:e4:3c:cf:4a:90:72:32:55:
+    81:2c:30:ce:d8:46:e7:99:b7:d7:df:cc:e5:b2:4c:
+    f5:41:7f:03:81:a1:f4:3a:94:c1:ee:a2:05:ea:6c:
+    58:db:34:f5:7b:0a:25:ca:bf:6b:80:1d:9d:51:ab:
+    04:df:ad:d5:d0:95:08:af:ab:1a:09:4a:57:49:80:
+    67:22:03:11:12:b9:2c:0c:43:1b:a5:28:3b:d8:b5:
+    52:87:40:f2:87:c6:83:65:87:44:1a:8d:78:3a:1c:
+    e7:f5:d6:12:37:40:51:a1:cf:86:0a:46:22:98:ed:
+    7c:7b:97:70:ac:e5:2e:5b:0b:05:5c:89:e6:df:00:
+    fc:c4:20:03:3c:18:6e:4b:a2:2f:e4:7a:43:21:59:
+    52:3e:f9:d5:b3:0d:36:cb:4d:85:24:2b:37:c3:f0:
+    c4:73:81:05:2e:37:12:6a:91:a7:e0:e2:50:39:4f:
+    a1
+prime1:
+    00:ea:d4:33:a0:5f:da:b2:a8:10:2a:be:a2:74:0b:
+    f0:37:bd:8e:04:48:bc:9b:51:90:5b:a9:0b:78:f0:
+    7d:d3:8a:f4:5c:f9:99:98:e4:27:67:f9:48:cd:00:
+    a2:fb:94:88:96:0b:3d:87:f7:01:21:64:fe:d7:59:
+    99:b3:65:84:ba:35:7f:23:d5:03:9f:b1:eb:aa:34:
+    9c:95:ec:43:96:dd:d7:6d:01:17:51:a5:fe:a0:4d:
+    20:a4:f1:24:84:9f:e8:01:3e:1e:f8:f2:25:6f:1d:
+    82:38:f8:16:66:a4:c7:f9:17:70:ab:2d:a5:a3:0d:
+    42:3f:ab:4a:f6:21:f9:3c:91
+prime2:
+    00:df:cc:c3:8a:b2:49:cb:dc:38:18:7f:26:3a:ed:
+    21:03:1f:52:0b:31:4c:44:9d:a6:e2:cf:58:ae:bd:
+    b6:73:ae:38:d8:21:49:53:a7:23:dd:01:ed:78:be:
+    b1:98:22:34:f6:a1:8c:f0:79:16:15:32:ae:6a:fa:
+    e8:0e:0e:ca:21:73:d1:93:d9:64:a7:c5:30:48:2e:
+    13:36:24:2f:5e:43:f1:4d:1a:61:d8:b7:e8:37:2b:
+    5b:12:2b:dd:d8:16:25:d6:fd:95:a3:f2:54:62:3f:
+    a7:a7:b7:55:6f:a9:02:df:ad:98:f9:c3:a1:26:94:
+    11:81:f2:ad:81:82:3b:04:6d
+exponent1:
+    56:e6:f2:b8:0d:e1:04:2e:97:d5:09:b9:5a:d2:b4:
+    32:1c:8e:fa:dc:e4:17:62:86:d6:b4:e7:4e:f9:48:
+    c7:49:6c:07:20:43:8c:46:1a:a3:2a:a8:9b:5c:f9:
+    f3:ba:53:15:9b:d1:48:88:cb:3d:4d:7f:d5:b8:0d:
+    de:4a:da:64:82:b9:ab:4c:00:4c:4f:ee:93:8d:66:
+    c9:40:a6:fe:a4:d8:3d:39:a3:24:8f:16:7c:c2:2e:
+    2b:7c:25:f4:82:ac:bc:10:fe:2b:48:89:3b:e6:a2:
+    b3:6c:73:f5:c6:53:4e:c6:32:e6:d6:3c:ae:eb:90:
+    31:b9:b5:43:02:ed:96:51
+exponent2:
+    00:da:5c:27:ce:83:f6:8c:f9:e9:a1:bd:2d:c8:00:
+    e6:5c:ed:8a:57:71:5a:40:f8:b1:84:4b:5a:f3:e4:
+    16:c8:f8:0c:6e:94:cb:be:db:2d:9a:cd:ee:ae:09:
+    21:ae:96:71:a6:d2:29:79:d8:2b:3b:b3:9f:8a:b2:
+    15:08:e2:55:46:1e:83:36:06:be:b7:13:26:f0:c6:
+    43:e8:67:95:f0:1b:ca:ac:b8:39:10:03:20:87:f3:
+    bd:80:15:5c:f7:21:64:fa:47:a2:61:bc:67:a9:15:
+    02:b8:19:a1:3a:b9:65:1c:69:7d:00:f5:67:9f:04:
+    89:b0:88:df:d1:a5:07:80:61
+coefficient:
+    30:bf:a2:53:4c:94:8f:91:59:b3:f5:fc:bc:b3:f1:
+    64:9c:2e:65:4f:bb:18:73:35:1d:b2:57:84:7f:c1:
+    65:8d:29:a0:1c:c1:34:58:ca:8f:c9:ae:e6:5d:fa:
+    4f:8c:7e:11:9e:b2:4a:49:9f:27:98:ac:11:d5:dc:
+    28:ee:8c:24:5b:a4:53:c6:07:50:c5:82:37:f6:19:
+    a4:d8:3f:f7:65:cd:a0:1e:4f:b5:41:63:fd:bb:04:
+    04:70:2e:d4:66:73:5e:07:23:a0:0f:38:ad:c8:2f:
+    2d:0a:be:e1:47:db:f3:14:0a:0b:7c:d0:9a:a8:64:
+    7a:ad:c6:7b:04:e1:83:8f
+```
+
+
+#### How to use it? The Encryption Flow
+
+![asymetrics flow](/assets/certs-in-and-outs/alice-bob.drawio.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 In very oversimplified manner this happens
 
@@ -109,21 +268,27 @@ In very oversimplified manner this happens
 ```
 
 ---
-### The roles of  🟢 Public and 🔵Private keys
 
-| **What one key does**   | **The other will validate** |
-|-----------------|-----------------------|
-| 🟢 Public encrypts         | 🔵Private decrypts             |
-| 🔵Private digitally signs | 🟢Public verifies signature| 
-| 🔵Private authenticate    | 🟢Public verifies authentication| 
+### The roles of  🟢 Public and 🔴 Private keys
+
+| **What one key does**         | **The other will validate**         |
+|-------------------------------|--------------------------------------|
+| 🟢 Public encrypts             | 🔴 Private decrypts                 |
+| 🔴 Private digitally signs     | 🟢 Public verifies signature         |
+| 🔴 Private authenticates       | 🟢 Public verifies authentication    |
+
 ---
+
+## Key exchange
+
+Since both communicating parties will send their public keys there is no need for any kind of secure key exchange protocol. 
 
 ## Public-Key Infrastructure (PKI)
 
 > How the heck validate the cert? 😵
 {: .prompt-tip }
 
-### Certificate Authorities (Verification Authority)
+### The hero of the day -> Certificate Authorities (Verification Authority)
 
 - A company that is considered trustworthy and produces digital certificates for other individuals and
 companies (i.e. subjects) bearing that subject’s public key
@@ -133,11 +298,19 @@ companies (i.e. subjects) bearing that subject’s public key
 - issues digital certificates;
 - helps establish trust between communicating entities over the internet;
 - verifies domain names and organizations to validate their identities; and
-- maintains [certificate revocation lists](https://www.techtarget.com/searchsecurity/definition/Certificate-Revocation-List).⛔
+- maintains [certificate revocation lists (CRL)](https://www.techtarget.com/searchsecurity/definition/Certificate-Revocation-List).⛔
+- understands [Online Certificate Status Protocol  (OCSP)](https://www.e2encrypted.com/pki/pki-certificate-revoke-ocsp/#ocsp-request) and responds to clients regarding the validity of the cert
 
-![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170056.png)
+#### How browsers validate the certificate of the website?
 
-### Chain of thrust
+![certs-in-and-outs](/assets/certs-in-and-outs/ca.drawio.png)
+
+> Browsers are sending a request to the CRL endpoint based on the certificate CRL Enpoint field in the certificate of the website.
+{: .prompt-tip }
+
+![alt text](/assets/certs-in-and-outs/crl-example.png)
+
+### How new certificates can be validated? Chain of thrust
 
 > Hierarchy of certificates is used to verify the validity of a certificate’s issuer. This hierarchy is known as a _chain of trust_. In a chain of trust, certificates are issued and signed by certificates that live higher up in the hierarchy.
 {: .prompt-info }
@@ -146,36 +319,145 @@ companies (i.e. subjects) bearing that subject’s public key
 
 #### Trust Anchor
 
-- A public cert key named as CA cert which is trusted by both of the communicating parties
+- A public cert key named as CA cert which is trusted by both of the communicating parties, usually exists at OS level
 
 #### Intermediete Cert
 
 - you cannot issue new cert from thrusted public CA certs since you need a new layer
 - extra security to provide validation for the CA cert
-- cheaper then issueing new CA cert for every need
+- cheaper then issueing new CA cert for every need. New CA cet is expensive because it requires special validations of the issuer company and the processes [how this CA cert private keys are stored](https://security.stackexchange.com/questions/24896/how-do-certification-authorities-store-their-private-root-keys)
 
 #### End Entity Cert / Leaf Cert
 
 - no other cert can be above it
 - represents the end entity of the chain
 
-What is CSR (Certificate Signing Request)?
+## How to get a new certificate?
+
+### Asking the the big borther (CA) to create one with a love letter (CSR) (Certificate Signing Request)?
+
 > It is a request which sent to the CA to issue a new certificate with the given properties
 {: .prompt-info }
 
 ##### What happens?
 
-- public key pair is generated
-- requested cert field are asked from the user
-- CSR generated and contains:
+- public/private key pair is generated
+- CSR generated:
   - public key
   - data fields are included with the input from the user
 
-#### Example
+#### Example to create and decode CSR
 
-Decoder <https://ssltools.godaddy.com/views/csrDecoder>
+(Usefull onlline tool to decode CSRs) <https://ssltools.godaddy.com/views/csrDecoder>
 
-![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712181327.png)
+- generate csr
+
+```bash
+openssl req -newkey rsa:2048 -keyout example.key -out example.csr
+```
+
+This will create a key and a csr. Lets see the csr:
+
+```
+───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+       │ File: example.csr
+───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+   1   │ -----BEGIN CERTIFICATE REQUEST-----
+   2   │ MIIC9DCCAdwCAQAwfTELMAkGA1UEBhMCSFUxDjAMBgNVBAgMBUZlamVyMRAwDgYD
+   3   │ VQQHDAdWZWxlbmNlMRAwDgYDVQQKDAdUZWxla29tMRkwFwYDVQQDDBB0ZXN0LmV4
+   4   │ YW1wbGUuY29tMR8wHQYJKoZIhvcNAQkBFhB0ZXN0QGV4YW1wbGUuY29tMIIBIjAN
+   5   │ BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAn7WtQNMvPgWGRkQk3NyZpv+HHRL/
+   6   │ 5mxHluJ1u5v2V+1Q+zP0ctKFmksOP/hlSlj7v7+QWYuqWLlA4vqCx43lzLN8f6pB
+   7   │ WHtefYXKBHm8cT05QvAPXfeWmulGTsKESB+SETiAzjuep6+kVmslomogQnkk0sr8
+   8   │ xAye/XlrdPSkN1IKljIHpSi0+eR2oyr1PfJoBvin5qZDTg6DP43N5MpaCyFOGwTB
+   9   │ 9PPprtHo8jJ0u9j60Brv7ED7VkygVbwpNEfMznjDaSKKCpB/8Xlvn9oxc182956U
+  10   │ 4Vc5VKThCe9NE3PCOb2a2DDGXAOipY1r+l/fFAmNI9TzJaFP0fCnmYtXhwIDAQAB
+  11   │ oDIwEwYJKoZIhvcNAQkHMQYMBHRlc3QwGwYJKoZIhvcNAQkCMQ4MDHRlc3QgY29t
+  12   │ cGFueTANBgkqhkiG9w0BAQsFAAOCAQEAWAXxLyInas6xsVExlSi8w7Pkl238oHNc
+  13   │ 3Oj9MJNVw1iiBMMgL9WBrIQ8g/Qn64eJi+IMKz0oan+2ajfOZhsRziuS5u24PuvP
+  14   │ TNNqq2hr5AqOAnzGZyHP0hqwIJpm2O3gQh6/4GpphxwEbr41zGtv3rzXl2DjZMyw
+  15   │ 0fXQsxBlys2O/y75amB3qrNM1WhFNnC4o+auIsocDckXuBvjx2oOzx3MJxt4J+V9
+  16   │ fRSzdCqWAnkCyePaxvoiO9l/YRReG7Cfi59PCo4DnVcWOqvSyutJ5em4IBxDCMH8
+  17   │ SZKQBrGKRkFfM1ax7UDCCOvCghEBW5Wg56r1HD89zXeZVzu1nQyZFg==
+  18   │ -----END CERTIFICATE REQUEST-----
+───────┴───────────────────────────────────
+```
+
+Nothing too fancy right?
+
+Lets dissect it:
+
+```bash
+openssl req -in example.csr -noout -text
+```
+
+```bash
+Certificate Request:
+    Data:
+        Version: 1 (0x0)
+        Subject: C=HU, ST=Fejer, L=Velence, O=Telekom, CN=test.example.com, emailAddress=test@example.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:9f:b5:ad:40:d3:2f:3e:05:86:46:44:24:dc:dc:
+                    99:a6:ff:87:1d:12:ff:e6:6c:47:96:e2:75:bb:9b:
+                    f6:57:ed:50:fb:33:f4:72:d2:85:9a:4b:0e:3f:f8:
+                    65:4a:58:fb:bf:bf:90:59:8b:aa:58:b9:40:e2:fa:
+                    82:c7:8d:e5:cc:b3:7c:7f:aa:41:58:7b:5e:7d:85:
+                    ca:04:79:bc:71:3d:39:42:f0:0f:5d:f7:96:9a:e9:
+                    46:4e:c2:84:48:1f:92:11:38:80:ce:3b:9e:a7:af:
+                    a4:56:6b:25:a2:6a:20:42:79:24:d2:ca:fc:c4:0c:
+                    9e:fd:79:6b:74:f4:a4:37:52:0a:96:32:07:a5:28:
+                    b4:f9:e4:76:a3:2a:f5:3d:f2:68:06:f8:a7:e6:a6:
+                    43:4e:0e:83:3f:8d:cd:e4:ca:5a:0b:21:4e:1b:04:
+                    c1:f4:f3:e9:ae:d1:e8:f2:32:74:bb:d8:fa:d0:1a:
+                    ef:ec:40:fb:56:4c:a0:55:bc:29:34:47:cc:ce:78:
+                    c3:69:22:8a:0a:90:7f:f1:79:6f:9f:da:31:73:5f:
+                    36:f7:9e:94:e1:57:39:54:a4:e1:09:ef:4d:13:73:
+                    c2:39:bd:9a:d8:30:c6:5c:03:a2:a5:8d:6b:fa:5f:
+                    df:14:09:8d:23:d4:f3:25:a1:4f:d1:f0:a7:99:8b:
+                    57:87
+                Exponent: 65537 (0x10001)
+        Attributes:
+            challengePassword        :test
+            unstructuredName         :test company
+            Requested Extensions:
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        58:05:f1:2f:22:27:6a:ce:b1:b1:51:31:95:28:bc:c3:b3:e4:
+        97:6d:fc:a0:73:5c:dc:e8:fd:30:93:55:c3:58:a2:04:c3:20:
+        2f:d5:81:ac:84:3c:83:f4:27:eb:87:89:8b:e2:0c:2b:3d:28:
+        6a:7f:b6:6a:37:ce:66:1b:11:ce:2b:92:e6:ed:b8:3e:eb:cf:
+        4c:d3:6a:ab:68:6b:e4:0a:8e:02:7c:c6:67:21:cf:d2:1a:b0:
+        20:9a:66:d8:ed:e0:42:1e:bf:e0:6a:69:87:1c:04:6e:be:35:
+        cc:6b:6f:de:bc:d7:97:60:e3:64:cc:b0:d1:f5:d0:b3:10:65:
+        ca:cd:8e:ff:2e:f9:6a:60:77:aa:b3:4c:d5:68:45:36:70:b8:
+        a3:e6:ae:22:ca:1c:0d:c9:17:b8:1b:e3:c7:6a:0e:cf:1d:cc:
+        27:1b:78:27:e5:7d:7d:14:b3:74:2a:96:02:79:02:c9:e3:da:
+        c6:fa:22:3b:d9:7f:61:14:5e:1b:b0:9f:8b:9f:4f:0a:8e:03:
+        9d:57:16:3a:ab:d2:ca:eb:49:e5:e9:b8:20:1c:43:08:c1:fc:
+        49:92:90:06:b1:8a:46:41:5f:33:56:b1:ed:40:c2:08:eb:c2:
+        82:11:01:5b:95:a0:e7:aa:f5:1c:3f:3d:cd:77:99:57:3b:b5:
+        9d:0c:99:16
+```
+> You can see there is a signature with the private key and all the properties that can be validated by the CA. The CA will validate these data during the process. This validation is different based on the required validation scope and level.
+
+### Cert Validation Levels
+
+- Domain Validation -> the CA validates that the requestor really has the ownership of the domain in the csr. Usually asking to put a file in a specific path under the domain, or putting a new DNS subdomain entry under the domain
+- Organization Validation -> CA will contact the organization and will check every detail of the company that will be included in the cert
+- Extended Validation -> CA will make full background check of the organization, by actually visiting the company and checking the IDs of the key employees etc.. 
+
+## Cert Validity Scopes
+
+- Single Domain Certs -> for single domain
+- Wildcard SSL Certs -> valid for any subdomain
+- Multi-Domain SSL Cert -> valid for multiple domain
+- Self signed certificates
+
+---
+
 
 ---
 
@@ -239,21 +521,6 @@ Decoder <https://ssltools.godaddy.com/views/csrDecoder>
 
 ---
 
-## Cert Validity Scopes
-
-- Single Domain Certs -> for single domain
-- Wildcard SSL Certs -> valid for any subdomain
-- Multi-Domain SSL Cert -> valid for multiple domain
-- Self signed certificates
-
----
-
-### Cert Validation Levels
-
-- Domain Validation -> dns record or https challange (lets encrypt)
-- Organization Validation -> CA will contact the organization and will check every detail of the company that will be included in the cert
-- Extended Validation -> CA will make full background check of the organization
-
 ### How to retrieve certificates
 
 #### Self signed
@@ -261,6 +528,11 @@ Decoder <https://ssltools.godaddy.com/views/csrDecoder>
 ##### How to trust them
 
 #### Lets encrypt and cert bot
+dns record or https challange (lets encrypt)
+
+### HTTP based validation
+
+### DNS validation
 
 ---
 
@@ -289,6 +561,18 @@ In reality, all the “SSL Certificates” that you see advertised are really **
 > What will be encrypted during a https request?
 > only the request part of the http
 {: .prompt-tip }
+
+## https steps _> TLS handshake steps
+
+  There are multiple steps in the TLS handshake process. I have grouped them into 4 main categories:
+
+Hello Messages: The client sends a ClientHello message to initiate the handshake, and the server responds with a ServerHello message along with its digital certificate.
+
+Key Exchange: The server may send key exchange information, and the client responds with its own key exchange message (and certificate if requested).
+
+Cipher Spec: The client sends a CipherSpec message to switch to the negotiated encryption and follows it with a Finished message.
+
+Server Finalization: The server replies with its own CipherSpec and Finished messages, completing the handshake and establishing a secure connection.
 
 ## SSL termination
 

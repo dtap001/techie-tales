@@ -1,0 +1,16 @@
+@startuml
+
+@startuml
+actor Alice
+actor apubk as "As public key"
+actor aprivk as "As private key"
+
+actor Bob
+actor bpubk "Bs public key"
+actor bprivk as "Bs private key"
+
+
+@enduml
+
+
+@enduml

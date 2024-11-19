@@ -1,0 +1,37 @@
+@startuml
+
+@startuml
+actor Alice
+actor Bob
+
+rectangle AliceBox {
+    label "Alice"
+    Alice -> Alice_Public : "Send copy to Bob"
+    
+    rectangle "A's Public Key" as Alice_Public
+    rectangle "A's Private Key" as Alice_Private
+    rectangle "Decrypt Function" as DecryptFunc
+    rectangle "Data" as Alice_Data
+}
+
+rectangle BobBox {
+    label "Bob"
+    rectangle "Encrypt Function" as EncryptFunc
+    rectangle "A's Public Key (Copy)" as Bob_Public
+    rectangle "Data" as Bob_Data
+}
+
+Alice_Public -[hidden]-> Bob_Public : " " 
+
+Alice_Private --> DecryptFunc : "A's Private Key"
+DecryptFunc --> Alice_Data : "Decrypted Data"
+
+Bob -> EncryptFunc : "Encrypt Data"
+EncryptFunc --> Bob_Data : "Encrypted Data"
+EncryptFunc --> Bob_Public : "Use A's Public Key (Copy)"
+
+@enduml
+
+
+
+@enduml

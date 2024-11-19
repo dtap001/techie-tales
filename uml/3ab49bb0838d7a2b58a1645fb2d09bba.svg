@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="108px" preserveAspectRatio="none" style="width:475px;height:108px;background:#000000;" version="1.1" viewBox="0 0 475 108" width="475px" zoomAndPan="magnify"><defs/><g><rect fill="#08021A" height="1" style="stroke: #08021A; stroke-width: 1.0;" width="1" x="0" y="0"/><rect fill="#33FF02" height="21.2969" style="stroke: #33FF02; stroke-width: 1.0;" width="469" x="5" y="5"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="467" x="6" y="20">[From 3ab49bb0838d7a2b58a1645fb2d09bba.uml (line 5) ]</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="0" x="10" y="40.2969"/><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="79" x="5" y="56.5938">@startuml</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="84" x="5" y="72.8906">actor Alice</text><text fill="#33FF02" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="151" x="5" y="89.1875">actor As public key</text><text fill="#FF0000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacingAndGlyphs" textLength="106" x="10" y="105.4844">Syntax Error?</text><!--MD5=[6b36ce60384af5900c4da4c10af35417]
+@startuml
+actor Alice
+actor As public key
+actor As private key
+
+actor Bob
+actor Bs public key
+actor Bs private key
+
+actor Bob
+
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 11:22:07 CET 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.24+8-post-Ubuntu-1ubuntu322.04
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>
