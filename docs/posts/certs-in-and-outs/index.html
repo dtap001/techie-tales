@@ -1539,9 +1539,9 @@
   class="readtime"
   data-bs-toggle="tooltip"
   data-bs-placement="bottom"
-  title="5160 words"
+  title="5456 words"
 >
-  <em>28 min</em> read</span>
+  <em>30 min</em> read</span>
 
         </div>
       </div>
@@ -2194,16 +2194,16 @@ This way if the OS has some trusted root certificates pre installed it is easy t
 <ul>
   <li>Domain Validation -&gt; the CA validates that the requestor really has the ownership of the domain in the csr. Usually asking to put a file in a specific path under the domain, or putting a new DNS subdomain entry under the domain</li>
   <li>Organization Validation -&gt; CA will contact the organization and will check every detail of the company that will be included in the cert</li>
-  <li>Extended Validation -&gt; CA will make full background check of the organization, by actually visiting the company and checking the IDs of the key employees etc..</li>
+  <li>Extended Validation -&gt; CA will make full background check of the organization, by actually visiting the company and checking the IDs of the key employees etc.. This certificate type will print the company name in the browser bar above the certificate</li>
 </ul>
 
 <h2 id="cert-validity-scopes"><span class="me-2">Cert Validity Scopes</span><a href="#cert-validity-scopes" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2>
 
 <ul>
   <li>Single Domain Certs -&gt; for single domain</li>
-  <li>Wildcard SSL Certs -&gt; valid for any subdomain</li>
-  <li>Multi-Domain SSL Cert -&gt; valid for multiple domain</li>
-  <li>Self signed certificates</li>
+  <li>Wildcard SSL Certs -&gt; valid for any subdomain of one domain</li>
+  <li>Multi-Domain SAN SSL Cert -&gt; valid for multiple different domain</li>
+  <li>Self signed certificates -&gt; only valid on machines which has the signing CA cert installed in the OS trust store</li>
 </ul>
 
 <hr />
@@ -2933,22 +2933,40 @@ sgeyOorZpqBCCWuvVSR2n9KsBWyUtvo5Sb9xUt2YERi5EVctWHfCFRhFXP3u6qX/
 
 <h2 id="how-to-get-a-new-certificate"><span class="me-2">How to get a new certificate?</span><a href="#how-to-get-a-new-certificate" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2>
 
-<h3 id="asking-the-the-big-brother-ca-with-a-love-letter-csr-to-create-one-for-you"><span class="me-2">Asking the the big brother (CA) with a love letter (CSR) to create one for you?</span><a href="#asking-the-the-big-brother-ca-with-a-love-letter-csr-to-create-one-for-you" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3>
-
-<blockquote class="prompt-info">
-  <p>It is a request which sent to the CA to issue a new certificate with the given properties</p>
-</blockquote>
-
-<h4 id="what-happens"><span class="me-2">What happens?</span><a href="#what-happens" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
+<h3 id="option-a--asking-the-the-big-brother-ca-with-a-love-letter-csr-to-create-one-for-you"><span class="me-2">Option A:  Asking the the big brother (CA) with a love letter (CSR) to create one for you!</span><a href="#option-a--asking-the-the-big-brother-ca-with-a-love-letter-csr-to-create-one-for-you" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3>
 
 <ul>
-  <li>public/private key pair is generated</li>
-  <li>CSR generated:
+  <li>you should decide the certificate type</li>
+  <li>select a Certificate Authority like
     <ul>
-      <li>public key</li>
-      <li>data fields are included with the input from the user</li>
+      <li>DigiCert</li>
+      <li>GlobalSign</li>
+      <li>Sectigo</li>
+      <li>GoDaddy</li>
+      <li>etc..</li>
     </ul>
   </li>
+  <li>the CA will ask for a proof of domain ownership
+    <ul>
+      <li>email validation:
+        <ul>
+          <li>The CA will send a verification email message to an email address under your domain</li>
+        </ul>
+      </li>
+      <li>DNS validation:
+        <ul>
+          <li>CA will ask you to put a new TXT entry under your domain name with a specific value</li>
+        </ul>
+      </li>
+      <li>HTTP validation:
+        <ul>
+          <li>CA will ask you to upload a file to a specific path which can be reached through your domain like domain/.wellknown/pki-validation/</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Send the CSR file and present the neccessary extra documentation for EV/OV validation like utility bills, public records etc..</li>
+  <li>CA will isssue your new certificate and send it back to you</li>
 </ul>
 
 <h4 id="example-to-create-and-decode-csr"><span class="me-2">Example to create and decode CSR</span><a href="#example-to-create-and-decode-csr" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
@@ -3129,7 +3147,7 @@ sgeyOorZpqBCCWuvVSR2n9KsBWyUtvo5Sb9xUt2YERi5EVctWHfCFRhFXP3u6qX/
   <p>You can see there is a signature with the private key and all the properties that can be validated by the CA. The CA will validate these data during the process. This validation is different based on the required validation scope and level.</p>
 </blockquote>
 
-<h4 id="self-signed"><span class="me-2">Self signed</span><a href="#self-signed" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
+<h3 id="option-b-self-signed"><span class="me-2">Option B: Self signed</span><a href="#option-b-self-signed" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3>
 
 <p>We have already created some self signed certificate above, but now we will create it a way that the OS will trust it! To achieve this we have to create a CA cert also and add it to the OS
 trusted root cert store, then create a CSR which will be signed by our root CA cert.</p>
@@ -3204,7 +3222,7 @@ trusted root cert store, then create a CSR which will be signed by our root CA c
 </pre></td><td class="rouge-code"><pre>openssl x509 <span class="nt">-req</span> <span class="nt">-in</span> server.csr <span class="nt">-CA</span> rootCA.crt <span class="nt">-CAkey</span> rootCA.key <span class="nt">-CAcreateserial</span> <span class="nt">-out</span> server.crt <span class="nt">-days</span> 365 <span class="nt">-sha256</span>
 </pre></td></tr></tbody></table></code></div></div>
 
-<h5 id="try-it-out"><span class="me-2">Try it out!</span><a href="#try-it-out" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5>
+<h4 id="try-it-out"><span class="me-2">Try it out!</span><a href="#try-it-out" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
 
 <ul>
   <li>start a test server with openssl (amazing right? It is capable of this)</li>
@@ -3522,19 +3540,46 @@ SSL-Session:
 read R BLOCK
 </span></pre></td></tr></tbody></table></code></div></div>
 
-<h4 id="buy-certificates-from-certificate-authorities"><span class="me-2">Buy certificates from Certificate Authorities</span><a href="#buy-certificates-from-certificate-authorities" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
+<h3 id="option-c-lets-encrypt-free-certificate-authority"><span class="me-2">Option C: Let’s Encrypt free Certificate Authority</span><a href="#option-c-lets-encrypt-free-certificate-authority" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3>
 
-<blockquote>
-  <p>For this you have to decide the tyope of certificate</p>
+<blockquote class="prompt-info">
+  <p>Let’s Encrypt is a free, automated, and open Certificate Authority (CA) that provides SSL/TLS certificates to secure websites using ACME procotol. It simplifies the process of obtaining, installing, and renewing certificates using automation tools like Certbot.</p>
 </blockquote>
 
-<h4 id="lets-encrypt-and-cert-bot"><span class="me-2">Lets encrypt and cert bot</span><a href="#lets-encrypt-and-cert-bot" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
+<h4 id="pros"><span class="me-2">Pros</span><a href="#pros" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
 
-<p>dns record or https challange (lets encrypt)</p>
+<ul>
+  <li>its free</li>
+  <li>easy to automate without human intervention</li>
+  <li>backend by nonprofit company</li>
+  <li>trusted by all major browsers and devices</li>
+</ul>
 
-<h3 id="http-based-validation"><span class="me-2">HTTP based validation</span><a href="#http-based-validation" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3>
+<h4 id="cons"><span class="me-2">Cons</span><a href="#cons" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
 
-<h3 id="dns-validation"><span class="me-2">DNS validation</span><a href="#dns-validation" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3>
+<ul>
+  <li>issued certs lifetime is only 90 days</li>
+  <li>only domain validated certs are possible (no EV or OV)</li>
+  <li>no warranty</li>
+</ul>
+
+<blockquote class="prompt-info">
+  <p>What is ACME: Automatic Certificate Management Environment. It is a protocol designed to automate the process of issuing, renewing, and revoking SSL/TLS certificates. ACME eliminates the need for manual certificate management by allowing software to interact with a Certificate Authority (CA) directly.</p>
+</blockquote>
+
+<h5 id="validation-methods"><span class="me-2">Validation methods</span><a href="#validation-methods" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h5>
+
+<ul>
+  <li>HTTP-01 Challenge: Place a specific file in a .well-known/acme-challenge/ directory on your server.</li>
+  <li>DNS-01 Challenge: Add a TXT record to your domain’s DNS configuration.</li>
+  <li>TLS-ALPN-01 Challenge: Requires the server to support ALPN (Application-Layer Protocol Negotiation) and respond to a challenge over HTTPS.</li>
+</ul>
+
+<h4 id="suggested-usage-with-dns-validation"><span class="me-2">Suggested usage with DNS validation</span><a href="#suggested-usage-with-dns-validation" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4>
+
+<p>I prefer using this method since it only requires that you delegate your domain ownership from the original domain registrar to CloudFlare and use the CloudFlare API with some automation to renew your certificate.</p>
+
+<p>https://github.com/dtap001/traefik-proxy-stack-docker-compose</p>
 
 <hr />
 

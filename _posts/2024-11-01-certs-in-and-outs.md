@@ -345,14 +345,14 @@ This way if the OS has some trusted root certificates pre installed it is easy t
 
 - Domain Validation -> the CA validates that the requestor really has the ownership of the domain in the csr. Usually asking to put a file in a specific path under the domain, or putting a new DNS subdomain entry under the domain
 - Organization Validation -> CA will contact the organization and will check every detail of the company that will be included in the cert
-- Extended Validation -> CA will make full background check of the organization, by actually visiting the company and checking the IDs of the key employees etc..
+- Extended Validation -> CA will make full background check of the organization, by actually visiting the company and checking the IDs of the key employees etc.. This certificate type will print the company name in the browser bar above the certificate
 
 ## Cert Validity Scopes
 
 - Single Domain Certs -> for single domain
-- Wildcard SSL Certs -> valid for any subdomain
-- Multi-Domain SSL Cert -> valid for multiple domain
-- Self signed certificates
+- Wildcard SSL Certs -> valid for any subdomain of one domain
+- Multi-Domain SAN SSL Cert -> valid for multiple different domain
+- Self signed certificates -> only valid on machines which has the signing CA cert installed in the OS trust store
 
 ---
 
@@ -761,17 +761,24 @@ openssl x509 -in combined.pem -text -noout
 
 ## How to get a new certificate?
 
-### Asking the the big brother (CA) with a love letter (CSR) to create one for you?
+### Option A:  Asking the the big brother (CA) with a love letter (CSR) to create one for you!
 
-> It is a request which sent to the CA to issue a new certificate with the given properties
-{: .prompt-info }
-
-#### What happens?
-
-- public/private key pair is generated
-- CSR generated:
-  - public key
-  - data fields are included with the input from the user
+- you should decide the certificate type
+- select a Certificate Authority like
+  - DigiCert
+  - GlobalSign
+  - Sectigo
+  - GoDaddy
+  - etc..
+- the CA will ask for a proof of domain ownership
+  - email validation:
+    - The CA will send a verification email message to an email address under your domain
+  - DNS validation:
+    - CA will ask you to put a new TXT entry under your domain name with a specific value
+  - HTTP validation:
+    - CA will ask you to upload a file to a specific path which can be reached through your domain like domain/.wellknown/pki-validation/
+- Send the CSR file and present the neccessary extra documentation for EV/OV validation like utility bills, public records etc..
+- CA will isssue your new certificate and send it back to you
 
 #### Example to create and decode CSR
 
@@ -871,7 +878,7 @@ Certificate Request:
 
 > You can see there is a signature with the private key and all the properties that can be validated by the CA. The CA will validate these data during the process. This validation is different based on the required validation scope and level.
 
-#### Self signed
+### Option B: Self signed
 
 We have already created some self signed certificate above, but now we will create it a way that the OS will trust it! To achieve this we have to create a CA cert also and add it to the OS
 trusted root cert store, then create a CSR which will be signed by our root CA cert.
@@ -918,7 +925,7 @@ openssl req -new -key server.key -out server.csr
 openssl x509 -req -in server.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out server.crt -days 365 -sha256
 ```
 
-##### Try it out!
+#### Try it out!
 
 - start a test server with openssl (amazing right? It is capable of this)
 
@@ -1083,17 +1090,38 @@ SSL-Session:
 read R BLOCK
 ```
 
-#### Buy certificates from Certificate Authorities
+### Option C: Let's Encrypt free Certificate Authority
 
-> For this you have to decide the tyope of certificate
+> Let’s Encrypt is a free, automated, and open Certificate Authority (CA) that provides SSL/TLS certificates to secure websites using ACME procotol. It simplifies the process of obtaining, installing, and renewing certificates using automation tools like Certbot.
+{: .prompt-info }
 
-#### Lets encrypt and cert bot
+#### Pros
 
-dns record or https challange (lets encrypt)
+- its free
+- easy to automate without human intervention
+- backend by nonprofit company
+- trusted by all major browsers and devices
 
-### HTTP based validation
+#### Cons
 
-### DNS validation
+- issued certs lifetime is only 90 days
+- only domain validated certs are possible (no EV or OV)
+- no warranty
+
+> What is ACME: Automatic Certificate Management Environment. It is a protocol designed to automate the process of issuing, renewing, and revoking SSL/TLS certificates. ACME eliminates the need for manual certificate management by allowing software to interact with a Certificate Authority (CA) directly.
+{: .prompt-info }
+
+##### Validation methods
+
+- HTTP-01 Challenge: Place a specific file in a .well-known/acme-challenge/ directory on your server.
+- DNS-01 Challenge: Add a TXT record to your domain's DNS configuration.
+- TLS-ALPN-01 Challenge: Requires the server to support ALPN (Application-Layer Protocol Negotiation) and respond to a challenge over HTTPS.
+
+#### Suggested usage with DNS validation
+
+I prefer using this method since it only requires that you delegate your domain ownership from the original domain registrar to CloudFlare and use the CloudFlare API with some automation to renew your certificate.
+
+https://github.com/dtap001/traefik-proxy-stack-docker-compose
 
 ---
 
