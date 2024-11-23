@@ -755,8 +755,6 @@ openssl rsa -in combined.pem -text -noout
 openssl x509 -in combined.pem -text -noout
 ```
 
-![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170647.png)
-
 ---
 
 ## How to get a new certificate?
@@ -1121,7 +1119,14 @@ read R BLOCK
 
 I prefer using this method since it only requires that you delegate your domain ownership from the original domain registrar to CloudFlare and use the CloudFlare API with some automation to renew your certificate.
 
-https://github.com/dtap001/traefik-proxy-stack-docker-compose
+The process itself is quite simple:
+
+- ensure you have set the dns serverat your dns registrator to cloudflare [LINK](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/
+)
+- create cloudflare api token [LINK](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
+
+> After this you can start an example docker compose project which will retrieve ssl certs for your domain using your token
+Use [this repository as example](https://github.com/dtap001/example-webapp-with-traefik-and-ssl)
 
 ---
 
@@ -1151,18 +1156,262 @@ In reality, all the “SSL Certificates” that you see advertised are really **
 > only the request part of the http
 {: .prompt-tip }
 
-## https steps _> TLS handshake steps
+## HTTPS internals the TLS handshake
 
-  There are multiple steps in the TLS handshake process. I have grouped them into 4 main categories:
+> The TLS handshake is the process how the client (browser, curl etc..) and the server establish a seure communication over TLS protocol.
 
-Hello Messages: The client sends a ClientHello message to initiate the handshake, and the server responds with a ServerHello message along with its digital certificate.
+```bash
+Client                                  Server
+  |      ClientHello                   |
+  |----------------------------------->| (Includes supported TLS versions, cipher suites, random value)
+  |                                    |
+  |      ServerHello                   |
+  |<-----------------------------------| (Includes chosen cipher suite, random value, server's public key)
+  |                                    |
+  |      Key Exchange (ECDHE)          |
+  |<----------------------------------->| (Both exchange keys to compute shared session key)
+  |                                    |
+  |      Finished                      |
+  |<----------------------------------->| (Both verify the handshake and secure the channel)
+```
 
-Key Exchange: The server may send key exchange information, and the client responds with its own key exchange message (and certificate if requested).
+> In a traditional TLS handshake process only the server proves its identity for the client with its certificate.
 
-Cipher Spec: The client sends a CipherSpec message to switch to the negotiated encryption and follows it with a Finished message.
+You can debug this flow with:
 
-Server Finalization: The server replies with its own CipherSpec and Finished messages, completing the handshake and establishing a secure connection.
+- openssl:
+
+```bash
+openssl s_client -connect <server>:443 -msg -debug
+```
+
+- curl in verbose mode:
+
+```bash
+curl -vvv https://<server>
+```
+
+- or even with ssh
+
+```bash
+ssh -vvv user@hostname
+```
+
 
 ## SSL termination
 
+> SSL termination is a process of terminationg the SSL/TLS connection on the edge of your infrastructure. This way helping the management of certificates since you dont have to maintain them outside of your infrastructure's secure context. Helps to debug and trace the interservice communication. Helps to easy the load pressure on servers since they dont have to deal with encryption.  SSL termination is usally done in the main ingress for your services.
+
 ## Mutual TLS
+
+> It is an extension for TLS protocol which make possible that both parties authenticate to each other during the handshake process. 
+
+
+mTLS handshake process:
+
+```bash
+Client                                  Server
+  |      ClientHello                   |
+  |----------------------------------->| (Includes supported TLS versions, cipher suites, random value)
+  |                                    |
+  |      ServerHello                   |
+  |<-----------------------------------| (Includes chosen cipher suite, random value, server's public key)
+  |                                    |
+  |      Certificate (Server's cert)    |
+  |<-----------------------------------| (Server presents its certificate for authentication)
+  |                                    |
+  |      Key Exchange (ECDHE)          |
+  |<----------------------------------->| (Both exchange keys to compute shared session key)
+  |                                    |
+  |      CertificateRequest            |
+  |<-----------------------------------| (Server requests client's certificate for authentication)
+  |                                    |
+  |      Certificate (Client's cert)    |
+  |----------------------------------->| (Client presents its certificate for authentication)
+  |                                    |
+  |      Finished                      |
+  |<----------------------------------->| (Both verify the handshake and secure the channel)
+```
+
+### Lets try  it out
+
+#### CA
+
+- Create the CA key
+
+```bash
+openssl genpkey -algorithm RSA -out ca.key -aes256
+```
+
+- Create the CA cert
+
+```bash
+openssl req -key ca.key -new -x509 -out ca.crt
+```
+
+- Trust the new CA 
+
+```bash
+sudo cp ca.crt /usr/local/share/ca-certificates/
+sudo update-ca-certificates
+```
+
+#### Server 
+
+- Create the server key
+
+```bash
+openssl genpkey -algorithm RSA -out server.key
+```
+
+- Create CSR for the server cert
+
+```bash
+openssl req -key server.key -new -out server.csr
+```
+
+- Create cert with csr and key for the server
+
+```bash
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365
+```
+
+#### Client 
+
+- Create the client key
+
+```bash
+openssl genpkey -algorithm RSA -out client.key
+```
+
+- Create the CSR for the client
+
+```bash
+openssl req -key client.key -new -out client.csr
+```
+
+- Create cert with csr and key for the client
+
+```bash
+openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 365
+```
+
+#### Try it out
+
+- Start the test server with openssl
+
+```bash
+openssl s_server -key server.key -cert server.crt -CAfile ca.crt -Verify 1 -accept 4433
+```
+
+- Test it with curl
+
+```bash
+curl -vvv --cert client.crt --key client.key --cacert ca.crt https://localhost:4433
+```
+
+You can see the connection is properly created with the client certs
+
+```bash
+❯ curl -vvv --cert client.crt --key client.key --cacert ca.crt https://localhost:4433
+*   Trying 127.0.0.1:4433...
+* Connected to localhost (127.0.0.1) port 4433 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+*  CAfile: ca.crt
+*  CApath: /etc/ssl/certs
+* TLSv1.0 (OUT), TLS header, Certificate Status (22):
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.2 (IN), TLS header, Certificate Status (22):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.2 (IN), TLS header, Finished (20):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Request CERT (13):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.2 (OUT), TLS header, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.3 (OUT), TLS handshake, Certificate (11):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.3 (OUT), TLS handshake, CERT verify (15):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+* ALPN, server did not agree to a protocol
+* Server certificate:
+*  subject: C=AU; ST=Some-State; O=Internet Widgits Pty Ltd; CN=localhost
+*  start date: Nov 23 12:06:50 2024 GMT
+*  expire date: Nov 23 12:06:50 2025 GMT
+*  common name: localhost (matched)
+*  issuer: C=AU; ST=Some-State; O=Internet Widgits Pty Ltd; CN=localhost
+*  SSL certificate verify ok.
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+> GET / HTTP/1.1
+> Host: localhost:4433
+> User-Agent: curl/7.81.0
+> Accept: */*
+> 
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
+```
+However when you try it without client cert it fails:
+
+```bash
+curl -vvv  https://localhost:4433
+*   Trying 127.0.0.1:4433...
+* Connected to localhost (127.0.0.1) port 4433 (#0)
+* ALPN, offering h2
+* ALPN, offering http/1.1
+*  CAfile: /etc/ssl/certs/ca-certificates.crt
+*  CApath: /etc/ssl/certs
+* TLSv1.0 (OUT), TLS header, Certificate Status (22):
+* TLSv1.3 (OUT), TLS handshake, Client hello (1):
+* TLSv1.2 (IN), TLS header, Certificate Status (22):
+* TLSv1.3 (IN), TLS handshake, Server hello (2):
+* TLSv1.2 (IN), TLS header, Finished (20):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Encrypted Extensions (8):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Request CERT (13):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Certificate (11):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, CERT verify (15):
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS handshake, Finished (20):
+* TLSv1.2 (OUT), TLS header, Finished (20):
+* TLSv1.3 (OUT), TLS change cipher, Change cipher spec (1):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.3 (OUT), TLS handshake, Certificate (11):
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+* TLSv1.3 (OUT), TLS handshake, Finished (20):
+* SSL connection using TLSv1.3 / TLS_AES_256_GCM_SHA384
+* ALPN, server did not agree to a protocol
+* Server certificate:
+*  subject: C=AU; ST=Some-State; O=Internet Widgits Pty Ltd; CN=localhost
+*  start date: Nov 23 12:06:50 2024 GMT
+*  expire date: Nov 23 12:06:50 2025 GMT
+*  common name: localhost (matched)
+*  issuer: C=AU; ST=Some-State; O=Internet Widgits Pty Ltd; CN=localhost
+*  SSL certificate verify ok.
+* TLSv1.2 (OUT), TLS header, Supplemental data (23):
+> GET / HTTP/1.1
+> Host: localhost:4433
+> User-Agent: curl/7.81.0
+> Accept: */*
+> 
+* TLSv1.2 (IN), TLS header, Supplemental data (23):
+* TLSv1.3 (IN), TLS alert, unknown (628):
+* OpenSSL SSL_read: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+* Closing connection 0
+curl: (56) OpenSSL SSL_read: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
+```
