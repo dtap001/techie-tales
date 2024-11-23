@@ -78,17 +78,23 @@ Certificates are used for:
 
 ## How to use certificate to secure communication?
 >
-> The smart people invented a system which relies on certificates to secyre the data using **public-key cryptography** or in another name -> **Asymmetric cryptography**
+> The smart people invented a system which relies on certificates to secure the data using **public-key cryptography** or in another name -> **Asymmetric cryptography**
 {: .prompt-info }
 
 ### Generate the public private keypair
 
-#### Algorithms for generation
+#### Algorithms for generation and key sizes
 
-The certificates usually generated with one of the following algorythms and usually one of the previously used hashing algorythms is also used
+The certificates usually generated with one of the following algorythms in combination with one of the previously mentioned hashing algorythms.
 
-- RSA -> using big prime numbers and based on factoring trap door function, using big keys to provide security
-- ECDSA (Elliptic curve) -> based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -> using shorter keys due to it
+Key is basically a random string of bits that serves as input for cryptographic algorithms. The stronger is the key and the encryption algorithm your data is in bigger safety.
+
+- RSA
+  - using big prime numbers and based on factoring trap door function, using big keys to provide security
+  - common keysize are 2048 and 4096. 2028 bit according to NIST is secure until 2030
+- ECDSA (Elliptic curve)
+  - based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -> using shorter keys due to it
+  - 256 bit keysize is equivalent of 3072 bit RSA keysize
 - DSA -> using discrete logaritmic properties and private key generated from the content that we want to sign -> used for ensuring file integrity and verification
 
 #### How to generate
@@ -154,9 +160,11 @@ Raw content:
    ```
 
 Dissect it with openssl:
+
 ```bash
 openssl pkey -in private_key.pem -text -noout
 ```
+
 ```text
 Private-Key: (2048 bit, 2 primes)
 modulus:
@@ -250,8 +258,7 @@ coefficient:
     7a:ad:c6:7b:04:e1:83:8f
 ```
 
-
-#### How to use it? The Encryption Flow
+#### How to use it to encrypt the communication
 
 ![asymetrics flow](/assets/certs-in-and-outs/alice-bob.drawio.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
@@ -281,7 +288,7 @@ In very oversimplified manner this happens
 
 ## Key exchange
 
-Since both communicating parties will send their public keys there is no need for any kind of secure key exchange protocol. 
+Since both communicating parties will send their public keys there is no need for any kind of secure key exchange protocol.
 
 ## Public-Key Infrastructure (PKI)
 
@@ -305,14 +312,16 @@ companies (i.e. subjects) bearing that subject’s public key
 
 ![certs-in-and-outs](/assets/certs-in-and-outs/ca.drawio.png)
 
-> Browsers are sending a request to the CRL endpoint based on the certificate CRL Enpoint field in the certificate of the website.
+> Browsers first checking the website cert against the os trusted root certs then
+they are sending a request to the CRL endpoint based on the certificate CRL Enpoint field in the certificate of the website.
 {: .prompt-tip }
 
 ![alt text](/assets/certs-in-and-outs/crl-example.png)
 
-### How new certificates can be validated? Chain of thrust
+### How new certificates can be validated? -> Chain of thrust
 
 > Hierarchy of certificates is used to verify the validity of a certificate’s issuer. This hierarchy is known as a _chain of trust_. In a chain of trust, certificates are issued and signed by certificates that live higher up in the hierarchy.
+This way if the OS has some trusted root certificates pre installed it is easy to build a certificate hierarchy which can prove the validity of the leaf certificate.
 {: .prompt-info }
 
 #### Contains three main parts
@@ -332,14 +341,432 @@ companies (i.e. subjects) bearing that subject’s public key
 - no other cert can be above it
 - represents the end entity of the chain
 
+### Cert Validation Levels
+
+- Domain Validation -> the CA validates that the requestor really has the ownership of the domain in the csr. Usually asking to put a file in a specific path under the domain, or putting a new DNS subdomain entry under the domain
+- Organization Validation -> CA will contact the organization and will check every detail of the company that will be included in the cert
+- Extended Validation -> CA will make full background check of the organization, by actually visiting the company and checking the IDs of the key employees etc..
+
+## Cert Validity Scopes
+
+- Single Domain Certs -> for single domain
+- Wildcard SSL Certs -> valid for any subdomain
+- Multi-Domain SSL Cert -> valid for multiple domain
+- Self signed certificates
+
+---
+
+## Certificate Standards
+
+> **Ok but how does everyone understands the certs?**
+{: .prompt-question }
+
+### X.509 for the win! 🏆
+
+>This standard make possible to all participants in the PKI will understand the content of the certificate by enforcing that every information/property within a digital certificate are all placed in the same location and in the same order.
+>
+{: .prompt-tip }
+
+#### Parts 🏗️
+
+As you can see above we can easily inspect a certificate with the openssl utility:
+
+```bash
+openssl x509 -in alice.crt -text -noout
+```
+
+#### Data Section
+
+```bash
+Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=FR, ST=Alsace, L=Strasbourg, O=www.freelan.org, OU=freelan, CN=Freelan Sample Certificate Authority, emailAddress=contact@freelan.org
+        Validity
+            Not Before: Apr 27 10:31:18 2012 GMT
+            Not After : Apr 25 10:31:18 2022 GMT
+        Subject: C=FR, ST=Alsace, O=www.freelan.org, OU=freelan, CN=alice, emailAddress=contact@freelan.org
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (4096 bit)
+                Modulus:
+                    00:dd:6d:bd:f8:80:fa:d7:de:1b:1f:a7:a3:2e:b2:
+                    02:e2:16:f6:52:0a:3c:bf:a6:42:f8:ca:dc:93:67:
+                    4d:60:c3:4f:8d:c3:8a:00:1b:f1:c4:4b:41:6a:69:
+                    d2:69:e5:3f:21:8e:c5:0b:f8:22:37:ad:b6:2c:4b:
+                    55:ff:7a:03:72:bb:9a:d3:ec:96:b9:56:9f:cb:19:
+                    99:c9:32:94:6f:8f:c6:52:06:9f:45:03:df:fd:e8:
+                    97:f6:ea:d6:ba:bb:48:2b:b5:e0:34:61:4d:52:36:
+                    0f:ab:87:52:25:03:cf:87:00:87:13:f2:ca:03:29:
+                    16:9d:90:57:46:b5:f4:0e:ae:17:c8:0a:4d:92:ed:
+                    08:a6:32:23:11:71:fe:f2:2c:44:d7:6c:07:f3:0b:
+                    7b:0c:4b:dd:3b:b4:f7:37:70:9f:51:b6:88:4e:5d:
+                    6a:05:7f:8d:9b:66:7a:ab:80:20:fe:ee:6b:97:c3:
+                    49:7d:78:3b:d5:99:97:03:75:ce:8f:bc:c5:be:9c:
+                    9a:a5:12:19:70:f9:a4:bd:96:27:ed:23:02:a7:c7:
+                    57:c9:71:cf:76:94:a2:21:62:f6:b8:1d:ca:88:ee:
+                    09:ad:46:2f:b7:61:b3:2c:15:13:86:9f:a5:35:26:
+                    5a:67:f4:37:c8:e6:80:01:49:0e:c7:ed:61:d3:cd:
+                    bc:e4:f8:be:3f:c9:4e:f8:7d:97:89:ce:12:bc:ca:
+                    b5:c6:d2:e0:d9:b3:68:3c:2e:4a:9d:b4:5f:b8:53:
+                    ee:50:3d:bf:dd:d4:a2:8a:b6:a0:27:ab:98:0c:b3:
+                    b2:58:90:e2:bc:a1:ad:ff:bd:8e:55:31:0f:00:bf:
+                    68:e9:3d:a9:19:9a:f0:6d:0b:a2:14:6a:c6:4c:c6:
+                    4e:bd:63:12:a5:0b:4d:97:eb:42:09:79:53:e2:65:
+                    aa:24:34:70:b8:c1:ab:23:80:e7:9c:6c:ed:dc:82:
+                    aa:37:04:b8:43:2a:3d:2a:a8:cc:20:fc:27:5d:90:
+                    26:58:f9:b7:14:e2:9e:e2:c1:70:73:97:e9:6b:02:
+                    8e:d3:52:59:7b:00:ec:61:30:f1:56:3f:9c:c1:7c:
+                    05:c5:b1:36:c8:18:85:cf:61:40:1f:07:e8:a7:06:
+                    87:df:9a:77:0b:a9:64:72:03:f6:93:fc:e0:02:59:
+                    c1:96:ec:c0:09:42:3e:30:a2:7f:1b:48:2f:fe:e0:
+                    21:8f:53:87:25:0d:cb:ea:49:f5:4a:9b:d0:e3:5f:
+                    ee:78:18:e5:ba:71:31:a9:04:98:0f:b1:ad:67:52:
+                    a0:f2:e3:9c:ab:6a:fe:58:84:84:dd:07:3d:32:94:
+                    05:16:45:15:96:59:a0:58:6c:18:0e:e3:77:66:c7:
+                    b3:f7:99
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Comment: 
+                OpenSSL Generated Certificate
+            X509v3 Subject Key Identifier: 
+                59:5F:C9:13:BA:1B:CC:B9:A8:41:4A:8A:49:79:6A:36:F6:7D:3E:D7
+            X509v3 Authority Key Identifier: 
+                23:6C:2D:3D:3E:29:5D:78:B8:6C:3E:AA:E2:BB:2E:1E:6C:87:F2:53
+```
+
+#### Signature Section
+
+- The cipher algorithm – the algorithm used by the issuer to create a digital signature
+- The digital signature for the CA – a hash of all the information in the certificate encrypted with the CA private key
+
+```bash
+ Signature Algorithm: sha1WithRSAEncryption
+    Signature Value:
+        13:e7:02:45:3e:a7:ab:bd:b8:da:e7:ef:74:88:ac:62:d5:dd:
+        10:56:d5:46:07:ec:fa:6a:80:0c:b9:62:be:aa:08:b4:be:0b:
+        eb:9a:ef:68:b7:69:6f:4d:20:92:9d:18:63:7a:23:f4:48:87:
+        6a:14:c3:91:98:1b:4e:08:59:3f:91:80:e9:f4:cf:fd:d5:bf:
+        af:4b:e4:bd:78:09:71:ac:d0:81:e5:53:9f:3e:ac:44:3e:9f:
+        f0:bf:5a:c1:70:4e:06:04:ef:dc:e8:77:05:a2:7d:c5:fa:80:
+        58:0a:c5:10:6d:90:ca:49:26:71:84:39:b7:9a:3e:e9:6f:ae:
+        c5:35:b6:5b:24:8c:c9:ef:41:c3:b1:17:b6:3b:4e:28:89:3c:
+        7e:87:a8:3a:a5:6d:dc:39:03:20:20:0b:c5:80:a3:79:13:1e:
+        f6:ec:ae:36:df:40:74:34:87:46:93:3b:a3:e0:a4:8c:2f:43:
+        4c:b2:54:80:71:76:78:d4:ea:12:28:d8:f2:e3:80:55:11:9b:
+        f4:65:dc:53:0e:b4:4c:e0:4c:09:b4:dc:a0:80:5c:e6:b5:3b:
+        95:d3:69:e4:52:3d:5b:61:86:02:e5:fd:0b:00:3a:fa:b3:45:
+        cc:c9:a3:64:f2:dc:25:59:89:58:0d:9e:6e:28:3a:55:45:50:
+        5f:88:67:2a:d2:e2:48:cc:8b:de:9a:1b:93:ae:87:e1:f2:90:
+        50:40:d9:0f:44:31:53:46:ad:62:4e:8d:48:86:19:77:fc:59:
+        75:91:79:35:59:1d:e3:4e:33:5b:e2:31:d7:ee:52:28:5f:0a:
+        70:a7:be:bb:1c:03:ca:1a:18:d0:f5:c1:5b:9c:73:04:b6:4a:
+        e8:46:52:58:76:d4:6a:e6:67:1c:0e:dc:13:d0:61:72:a0:92:
+        cb:05:97:47:1c:c1:c9:cf:41:7d:1f:b1:4d:93:6b:53:41:03:
+        21:2b:93:15:63:08:3e:2c:86:9e:7b:9f:3a:09:05:6a:7d:bb:
+        1c:a7:b7:af:96:08:cb:5b:df:07:fb:9c:f2:95:11:c0:82:81:
+        f6:1b:bf:5a:1e:58:cd:28:ca:7d:04:eb:aa:e9:29:c4:82:51:
+        2c:89:61:95:b6:ed:a5:86:7c:7c:48:1d:ec:54:96:47:79:ea:
+        fc:7f:f5:10:43:0a:9b:00:ef:8a:77:2e:f4:36:66:d2:6a:a6:
+        95:b6:9f:23:3b:12:e2:89:d5:a4:c1:2c:91:4e:cb:94:e8:3f:
+        22:0e:21:f9:b8:4a:81:5c:4c:63:ae:3d:05:b2:5c:5c:54:a7:
+        55:8f:98:25:55:c4:a6:90:bc:19:29:b1:14:d4:e2:b0:95:e4:
+        ff:89:71:61:be:8a:16:85
+```
+
+### PKCS#7 (Cryptographic Message Syntax Standard)
+
+- PKCS7 is standard used to sign and encrypt messages particularly in email communications or to sign digital documents for example emails or pdfs etc..
+- File extension: .p7b|.p7c|.p7m|.p7s
+- The key is not bundled in the file
+- One or more certificate packaged together but not signed or encrypted
+- The signed document cannot be read without special tools like openssl
+
+#### Create pkcs7 cert and key and sign and verify a document
+
+- generate a key
+
+```bash
+openssl genrsa -out private.key 2048
+```
+
+- generate a self signed cert
+
+```bash
+openssl req -new -x509 -key private.key -out certificate.crt -days 365 -subj "/C=US/ST=State/L=City/O=Organization/OU=Unit/CN=CommonName"
+```
+
+- create the test message that we want to sign
+
+```bash
+echo "This is a test message." > message.txt
+```
+
+- sign the document
+
+```bash
+openssl smime -sign -in message.txt -out signed_message.p7s -signer certificate.crt -inkey private.key -outform DER -nodetach
+```
+
+- print cert from signed document
+
+```bash
+openssl pkcs7 -in signed_message.p7s -print_certs -noout
+```
+
+- verify the document with
+
+```bash
+openssl smime -verify -in signed_message.p7s -CAfile certificate.crt -inform DER
+```
+
+```bash
+openssl smime -sign -in message.txt -out signed_message.p7s -signer certificate.crt -inkey private.key -outform DER -nodetach
+```
+
+## Certificate formats ☘️
+>
+> Certificate format is the way how the certificate is encoded, stored and which file extension is used.
+
+### Binary encoded
+>
+> Cannot be read easily without a tool.
+
+#### .DER (Distinguished Encoding Rules)
+
+- File extensions: .der|.cer
+- It is not a bundle format so either the key or the cert is stored in it
+- Often used by Java applications running as web servers
+- There are no human readable headers in the file
+
+##### Howto create and read it?
+
+- Generate an rsa key
+
+```bash
+openssl genrsa -out private.key 2048
+```
+
+- generate a self signed cert with this key
+
+```bash
+openssl req -new -x509 -key private.key -out certificate.crt -days 365
+```
+
+- Convert private key to der format
+
+```bash
+openssl rsa -in private.key -outform DER -out private.der
+```
+
+- Convert cert to der format
+
+```bash
+openssl x509 -in certificate.crt -outform DER -out certificate.der
+```
+
+Read the created cert
+
+```bash
+openssl x509 -in certificate.der -inform DER -text -noout
+```
+
+Read the created key
+
+```bash
+openssl rsa -in private.der -inform DER -text -noout
+```
+
+#### PKCS#12 (Public-Key Cryptographic Standards) sometimes references as PFX
+
+- File extensions: .pfx|.p12
+- This file is encrypted and protected with a password
+- The pfx file contain multiple cryptographics objects including public key certificates, private keys, intermediete keys.
+- One or more certificates packed together, password-encrypted
+- Use: you want to store and transfer your private keys and cert bundles securely
+
+##### How to create and read it?
+
+- generate the private key
+
+```bash
+openssl genrsa -out private.key 2048
+```
+
+- create a self signed certiface with you new key
+
+```bash
+openssl req -new -x509 -key private.key -out certificate.crt -days 365
+```
+
+- create the pfx file
+
+```bash
+openssl pkcs12 -export -out certificate.pfx -inkey private.key -in certificate.crt
+```
+
+As you noticed this export asked for a password. This will be needed when we want to read the pfx like this:
+
+```bash
+openssl pkcs12 -info -in input.pfx
+```
+
+This will output something like this:
+
+```bash
+❯ openssl pkcs12 -info -in certificate.pfx
+Enter Import Password:
+MAC: sha256, Iteration 2048
+MAC length: 32, salt length: 8
+PKCS7 Encrypted data: PBES2, PBKDF2, AES-256-CBC, Iteration 2048, PRF hmacWithSHA256
+Certificate bag
+Bag Attributes
+    localKeyID: 69 0A CA 69 19 B8 23 24 CD DE B9 F8 D1 C8 CA 19 F0 63 68 F5 
+subject=C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+issuer=C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+-----BEGIN CERTIFICATE-----
+MIIDazCCAlOgAwIBAgIUCz7AnQ57KFLQTEhMv+2H2c1u7vwwDQYJKoZIhvcNAQEL
+BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
+GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yNDExMjIxMDIzNDBaFw0yNTEx
+MjIxMDIzNDBaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
+HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQCXxyB1Pl7U55vnwgS2qcjrfG0sRaP7L3d3/NTD+bx3
+iOYXLA91oDaBM3aBtJOFCTmhA/dAkeBfnxIA0nCuNGR2B+IyOkXipZlk/825HCnP
+1QtFlRxpo7Hdq8+JqjGG+/0b3DghB3/0hH/xuGUD22cQmgJAL9ue6cIYx2Kp8Lxp
+tqsfBQ/1EDHoJRFr3SyLyxWcPVgoGucYzAmifsGIMD2/8blNuynDTmOSdAJX6/XQ
+Z7QzCqwFJQ6RO3oCWsIVg1O+oNPlyvbehho0Up0wRJoAWFS4476A9+n9iD9qQIUc
+S1hHkkYw5UTzSCbsve1nIbRSHgbCMgJYNkb4GN8e8caLAgMBAAGjUzBRMB0GA1Ud
+DgQWBBRJjaQ1lt9rWS4+Lfi9v+a21GlWHjAfBgNVHSMEGDAWgBRJjaQ1lt9rWS4+
+Lfi9v+a21GlWHjAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBb
+jGYjULouJmqdYP6GIfHoZP4JrenU9yRnZIfW14d2uDMlCwgTXYch/4ibl6S4Pa6X
+NPLeDL71WCC5l90R26cnsZzI5Ns/4jt7IxdAhhQl7yLe9kWFXxHBtLhiONb6UkjR
+JVNj2SUG2NpNHHN7+ZE/uScPexHRhuDOgcEnx7QUQvlQwrUy+ck9dkwV+EsIWhZR
+7kBqVanfQ4nKmkdr2a2nGbcZk4SGsSx5R56xYwXuiuphAOj9TUBi7IGDHbvfpBQt
+uw7YyIkDrHDxnCaF2jVVJARANSoJ5/7oB0GIKMdLVdzomtJCQuaORdAjRT5iKPYO
+TocjY9zu+zOS774OgGbU
+-----END CERTIFICATE-----
+PKCS7 Data
+Shrouded Keybag: PBES2, PBKDF2, AES-256-CBC, Iteration 2048, PRF hmacWithSHA256
+Bag Attributes
+    localKeyID: 69 0A CA 69 19 B8 23 24 CD DE B9 F8 D1 C8 CA 19 F0 63 68 F5 
+Key Attributes: <No Attributes>
+Enter PEM pass phrase:
+Verifying - Enter PEM pass phrase:
+-----BEGIN ENCRYPTED PRIVATE KEY-----
+MIIFNTBfBgkqhkiG9w0BBQ0wUjAxBgkqhkiG9w0BBQwwJAQQmh45yx3+OoIeYwG0
+yVMEgwICCAAwDAYIKoZIhvcNAgkFADAdBglghkgBZQMEASoEEOQ78AVEq+EcPEW9
+os1+xxMEggTQLSg2nLT7sIjvU7I0Embkg0XviYhLIGS6kaRis14aMAvJayTcv3C0
+nSHlf6mxnkfvqt6wKgNui3x7qAXtubxQKC0MXG9nXt8VHfoHUI1J3h/URLBIRHyv
+R5PuNZDdQ1dEeqUcrVzTIt4wrP82Nx9yPD3ICS+tJaNZTJPYvrABofljaXFJth3U
+EIGriuUM3qpcpfFhkGduiJDijxRYcI95QZERcDJ/VpX2ZEa5ad+YdYRT9t12VbhV
+lQhWvT5gcM/3GDuRKvDveCOqTlxwNFmy0Gus3R01Z/cvDwVRd8SvNIYPjKIb7MuW
+sg0l1VayRhN81TUCA8dgyvdsDjrMx8X3WH4vqxNZ5BJymRfkJi75VhC0Tm/OifDh
+VwO9tTn/U/MFIZggK5IuaZl9y9fbmiYCFSFtMxz6euBj7eXyT4xJTBuzNURwQ3R2
+S4aObz/tj5H7aIP4qpVCLTSRaXbuB/2h70HMgOJal6JHpKAzDKFiPhPQFOll1D2E
+eQP8iS7X6k6HgDixJ0PUb6mlqBwVEINO0oekPaWpiE7zgyNZIEw4U4Z6dilmlcTt
+RX+0smZ7T+j8mNx0aQLboIOnoNVLgiNgZCyb1lZFtkHBGBS51giz7Gaen+W4HjLz
+/Gv66/HHXK1oJxtJvUyiSxNVWtu/AwGwv99u5ahC97Ct/C7nTDVF7hj2Q2RMYdxN
+OVnK1OOkp+7cKlp8aHAkKdhlp1JswhcMCFv+aOtpNWgFOyvsWQUJGZ8BI19qLDZ5
+iuNn5EUlw7PsS+7XPDlVarjYjzBYcEwG4E4ukxPkFw/bWVvdtAdOIsiBvx91hTT/
+vCkF92lm/lckYARaucSZ0PRGD9ozbhw/6xcImCF6ME764VxkhESvlDNqLoAY4MUa
+5GSLLnDdhzPkuYLqnzoZiKiBC1Y4QZ47KsRnZtiFJwCLXuxU982qT7bxVEIWRHt9
+ER0iSHSVcNsr7ThBk1o25cDpyd5qO+VANzrBZ+yz1ROiiFfwiFgSLPLK0rlyRQM3
+oSHDtUYVqe3ZF7wdEnGV3c4UfpyDrU1EWxv4JK44Kx6fMS+T/gvsW4HpNG9aOwa9
+cMbTZ0i8z+amiFu402vGFo7fa+3R1ztb90OaasDtqgty11tcW+bN0oTp+fNp7d/M
+WsINwe/W2UJSkQvnEHkgs0GytmGAL84O0D5Zbqvv9tzBzzpn9wzoGI6jec58epzv
+uRhnBJ0cqDvPOV2NhXx1uGUP44A0eR5BK/mxj22m+uh+5IW9Kfk+8q5fHXQkDkKp
+qqXS5K6kjLp8WZurdeWFHevoEZqaSF86lGSXMNn2Zv98oJmSrnXV90h4qB465zm5
+ya4vJHX0+yVIXfFRpBqCaRcTB4BGZj33fIxp+baAZMOTIsl4Y82lFcW7JojrNa0p
+kxsAKE2GUukVdogysS5oGAtUbnB8oOckGBRt1UZ+M5AHgWKrCKQHK18VOK0QFw6V
+sgeyOorZpqBCCWuvVSR2n9KsBWyUtvo5Sb9xUt2YERi5EVctWHfCFRhFXP3u6qX/
+3WKZySiYAPrerUuAQe+wG3esjxPXf9qv1uKLmRC7pUD/raACbECE63nKBSlltMss
+1uUl+6lCn1ingASa7hbJ04UK11V4DW8ukDCkR95cu8cKP7nGm1mc+Fc=
+-----END ENCRYPTED PRIVATE KEY-----
+```
+
+> As you can see it really contains the cert and the encrypted private key. This is a safe format to store and share your certificate bundles
+{: .prompt-tip }
+
+### Base64 (ASCII)
+
+> Can be read easily with text editor and cli tools
+
+#### .PEM (Privacy-Enhanced Mail)
+
+- File extensions: .pem|.crt|.cer|.key
+- There is no encryption to protect the keys so the owner has to transfer them securely
+- Default format for OpenSSL. Suitable for sending files as text between systems
+- Can contain multiple certs in one file by simply concatenating the key and cert
+- Certificates are sorrounded with:
+  - -----BEGIN CERTIFICATE-----
+  - -----END CERTIFICATE-----
+- Keys are sorrunded wiht:
+  - -----BEGIN RSA PRIVATE KEY-----
+  - -----END RSA PRIVATE KEY-----
+- There are cases when more then one cert / key has to be included in the file like when the server does SSL termination and other intermediate cert is required to establish the full chain of trust:
+
+```bash
+-----BEGIN RSA PRIVATE KEY-----
+... (private key data) ...
+-----END RSA PRIVATE KEY-----
+-----BEGIN CERTIFICATE-----
+... (server certificate data) ...
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+... (intermediate certificate data) ...
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+... (root certificate data) ...
+-----END CERTIFICATE-----
+```
+
+How to create and read them:
+
+- generate key
+
+```bash
+openssl genrsa -out private.key 2048
+```
+
+- generate a self signed cert
+
+```bash
+openssl req -new -x509 -key private.key -out certificate.pem -days 365
+```
+
+- combine them in one file
+
+```bash
+cat private.key certificate.pem > combined.pem
+```
+
+- Reading only the key from this combined file
+
+```bash
+openssl rsa -in combined.pem -text -noout           
+```
+
+- Reading all the certs from this combined file
+
+```bash
+openssl x509 -in combined.pem -text -noout
+```
+
+![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170647.png)
+
+---
+
 ## How to get a new certificate?
 
-### Asking the the big borther (CA) to create one with a love letter (CSR) (Certificate Signing Request)?
+### Asking the the big brother (CA) with a love letter (CSR) to create one for you?
 
 > It is a request which sent to the CA to issue a new certificate with the given properties
 {: .prompt-info }
 
-##### What happens?
+#### What happens?
 
 - public/private key pair is generated
 - CSR generated:
@@ -358,7 +785,7 @@ openssl req -newkey rsa:2048 -keyout example.key -out example.csr
 
 This will create a key and a csr. Lets see the csr:
 
-```
+```bash
 ───────┬───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
        │ File: example.csr
 ───────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -441,93 +868,227 @@ Certificate Request:
         82:11:01:5b:95:a0:e7:aa:f5:1c:3f:3d:cd:77:99:57:3b:b5:
         9d:0c:99:16
 ```
+
 > You can see there is a signature with the private key and all the properties that can be validated by the CA. The CA will validate these data during the process. This validation is different based on the required validation scope and level.
-
-### Cert Validation Levels
-
-- Domain Validation -> the CA validates that the requestor really has the ownership of the domain in the csr. Usually asking to put a file in a specific path under the domain, or putting a new DNS subdomain entry under the domain
-- Organization Validation -> CA will contact the organization and will check every detail of the company that will be included in the cert
-- Extended Validation -> CA will make full background check of the organization, by actually visiting the company and checking the IDs of the key employees etc.. 
-
-## Cert Validity Scopes
-
-- Single Domain Certs -> for single domain
-- Wildcard SSL Certs -> valid for any subdomain
-- Multi-Domain SSL Cert -> valid for multiple domain
-- Self signed certificates
-
----
-
-
----
-
-## X.509
-
-> **Ok but how does everyone understands the certs?**
->
-##### X.509 for the win! 🏆
->
->This standard make possible to  that information within a digital certificate are all placed in the same location and in the same order, which makes it possible for all kinds of certificates to be shared across organizations
->
-{: .prompt-tip }
-
-### Parts 🎁
-
-#### How to dissect certificate
-
-#### Data Section
-
-![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712164200.png)
-
-#### Signature Section
-
-- The cipher algorithm – the algorithm used by the issuer to create a digital signature
-- The digital signature for the CA – a hash of all the information in the certificate encrypted with the CA private key
-
-![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170609.png)
-
-## Certificate key sizes
-
-- sha
-
-## Certificate formats ☘️
-
-### Binary
-
-#### .DER (Distinguished Encoding Rules)
-
-- A single binary certificate, platform-independent format, the default format for most browsers
-- Use: Used for Certificate Requests, which are always DER-encoded and then base64-encoded
-
-#### PKCS#12 (Public-Key Cryptographic Standards)
-
-- One or more certificates packed together, password-encrypted
-- Use: When the CA wants to ship a package confidentially that contains the private key
-
-### Base64 (ASCII)
-
-#### .PEM
-
-- Default format for OpenSSL. Suitable for sending files as text between systems
-- Prefixed with a “--BEGIN…” line
-- Use: When making a Certificate Request in an email
-
-#### PKCS#7
-
-- One or more certificate packaged together but not signed or encrypted
-- Use: When the CA wants to deliver multiple certificates to a destination
-
-![certs-in-and-outs](/assets/certs-in-and-outs/Pasted image 20230712170647.png)
-
----
-
-### How to retrieve certificates
 
 #### Self signed
 
-##### How to trust them
+We have already created some self signed certificate above, but now we will create it a way that the OS will trust it! To achieve this we have to create a CA cert also and add it to the OS
+trusted root cert store, then create a CSR which will be signed by our root CA cert.
+
+- Create key for CA cert
+
+```bash
+openssl genrsa -out rootCA.key 2048
+```
+
+- Create root certificate
+
+```bash
+openssl req -x509 -new -nodes -key rootCA.key -sha256 -days 3650 -out rootCA.crt
+```
+
+- Add to the OS trusted root cert store (linux)
+
+```bash
+sudo cp rootCA.crt /usr/local/share/ca-certificates/
+```
+
+- Apply it
+
+```bash
+sudo update-ca-certificates
+```
+
+- Okay now create or server key
+
+```bash
+openssl genrsa -out server.key 2048
+```
+
+- Now we have to create a CSR which will be signed by the CA cert later
+
+```bash
+openssl req -new -key server.key -out server.csr
+```
+
+- Time to sign the CSR with CA cert
+
+```bash
+openssl x509 -req -in server.csr -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out server.crt -days 365 -sha256
+```
+
+##### Try it out!
+
+- start a test server with openssl (amazing right? It is capable of this)
+
+```bash
+openssl s_server -cert server.crt -key server.key -CAfile rootCA.crt -accept 4433
+```
+
+- In a new terminal try to connect it 
+
+```bash
+openssl s_client -connect localhost:4433 -CAfile rootCA.crt
+```
+
+With this commands you can deeply debug your certificate and the TLS session itself
+
+```bash
+❯ openssl s_server -cert server.crt -key server.key -CAfile rootCA.crt -accept 4433
+Using default temp DH parameters
+ACCEPT
+-----BEGIN SSL SESSION PARAMETERS-----
+MIGDAgEBAgIDBAQCEwIEIMgh++wyAnXLISZyURB2+Ri9yzg2IkzQZioUBDQxqtjj
+BDD+ACxTOfWiGktJAXTzaxG/3YsvhkxB0SQGbjZU9r5/PvLMrJ0M/KXQHZrwz3Am
+wcWhBgIEZ0GQRKIEAgIcIKQGBAQBAAAArgcCBQC+0VG1swMCAR0=
+-----END SSL SESSION PARAMETERS-----
+Shared ciphers:TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_128_GCM_SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:DHE-RSA-AES256-SHA256:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES256-SHA:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA
+Signature Algorithms: ECDSA+SHA256:ECDSA+SHA384:ECDSA+SHA512:Ed25519:Ed448:ECDSA+SHA256:ECDSA+SHA384:ECDSA+SHA512:RSA-PSS+SHA256:RSA-PSS+SHA384:RSA-PSS+SHA512:RSA-PSS+SHA256:RSA-PSS+SHA384:RSA-PSS+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA512:ECDSA+SHA224:RSA+SHA224:DSA+SHA224:DSA+SHA256:DSA+SHA384:DSA+SHA512
+Shared Signature Algorithms: ECDSA+SHA256:ECDSA+SHA384:ECDSA+SHA512:Ed25519:Ed448:ECDSA+SHA256:ECDSA+SHA384:ECDSA+SHA512:RSA-PSS+SHA256:RSA-PSS+SHA384:RSA-PSS+SHA512:RSA-PSS+SHA256:RSA-PSS+SHA384:RSA-PSS+SHA512:RSA+SHA256:RSA+SHA384:RSA+SHA512:ECDSA+SHA224:RSA+SHA224
+Supported groups: x25519:secp256r1:x448:secp521r1:secp384r1:ffdhe2048:ffdhe3072:ffdhe4096:ffdhe6144:ffdhe8192
+Shared groups: x25519:secp256r1:x448:secp521r1:secp384r1:ffdhe2048:ffdhe3072:ffdhe4096:ffdhe6144:ffdhe8192
+CIPHER is TLS_AES_256_GCM_SHA384
+```
+
+```bash
+❯ openssl s_client -connect localhost:4433 -CAfile rootCA.crt
+Connecting to 127.0.0.1
+CONNECTED(00000009)
+Can't use SSL_get_servername
+depth=1 C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+verify return:1
+depth=0 C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+verify return:1
+---
+Certificate chain
+ 0 s:C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+   i:C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Nov 23 08:10:23 2024 GMT; NotAfter: Nov 23 08:10:23 2025 GMT
+ 1 s:C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+   i:C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Nov 23 08:09:36 2024 GMT; NotAfter: Nov 21 08:09:36 2034 GMT
+---
+Server certificate
+-----BEGIN CERTIFICATE-----
+MIIDWjCCAkKgAwIBAgIUWCSlOd3FwC1M523YmR3NJGIcrC4wDQYJKoZIhvcNAQEL
+BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
+GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yNDExMjMwODEwMjNaFw0yNTEx
+MjMwODEwMjNaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
+HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQClUK6+tWhKWumwAEYPNrk3Mi4Jy+gCrL4RjAVRsLaj
+zbSNEfDKubsI1LE6v3w9P1a67OmmY0AXfPWh6rN9xKvJ9EP0HHLnKi48XUYfI+Eu
+hhIuCdY0FYbYGcfGuqyHsYCUfi52NB3l4lUGexLGBnFtw0b/xgZclsJf2O9v9Bln
+WXrRjx7SM+9gKafA0GJuLGGjH0S0d+uikirbZWduKctoj9jjJ9tGoF0a0XucyiFz
+l3Ems2QD6wHS+vYyvSktVCLXamZdtJ+g69wvf+293BmjOtSZyK4ZnnSBFEk9tVYH
+zRrPWTrJw8j4clNvbq9R18WE2q0Z3iz+YNMrOJKI89f3AgMBAAGjQjBAMB0GA1Ud
+DgQWBBRLIkeIL8RofsaS1+ee4+920eF25DAfBgNVHSMEGDAWgBT54cF8S9EV5E0I
+W21aNrPv3U8K4jANBgkqhkiG9w0BAQsFAAOCAQEAGTY1+3ijMJd1ObOC4Vau+uMI
+KfLwFxzqFJ0w45+M0RKg9zow+aGnoWioAqdytVkXnQNFKqBrHJ6brXxy35LmCNRA
+pGAF/SDZCGbiVQqPyK1hIkFrvEYzP9oCBFveCle2wVOD7zpbNDbpbSt5kC4c68sa
+de5Lp0u4Pt547zennqPI7GyQCdB3bz7XiyyuoaEk6CRb8+uzOOIxvOdcWqu2IIDa
+5aI/97W/JCveEKgDcbny8vpV/oZwm+AlxUmp5NS33z+OhW4XlPj9+9B1/LLiX/m5
+7K8fdB0o+QM/ieDNwWe18bNe5jkQt0UArJFCHxUebVcYeSXHDk9sdb/stkGb/g==
+-----END CERTIFICATE-----
+subject=C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+issuer=C=AU, ST=Some-State, O=Internet Widgits Pty Ltd
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 2302 bytes and written 382 bytes
+Verification: OK
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Server public key is 2048 bit
+This TLS version forbids renegotiation.
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: 76B8EBB15D24AA9A7A41DD6BC1CA6DF77D89F4458C6517A974B54DCA2E9D0AE0
+    Session-ID-ctx: 
+    Resumption PSK: ECB7546E2D711C3BA419C0F888AE2B39043BE65324E1C9E485F573D38F85B42E20AEBB2B0EBDD9B106B6BFABB283CC24
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 7200 (seconds)
+    TLS session ticket:
+    0000 - 08 72 9b 9c 71 22 2e 4a-04 4a a6 8d e9 51 b8 3e   .r..q".J.J...Q.>
+    0010 - 4b d4 de 72 53 55 2d 25-04 fa 2f 15 33 b9 46 1c   K..rSU-%../.3.F.
+    0020 - 2d 16 13 4b 32 c2 b3 46-ff 16 76 c7 0e 28 ea 2d   -..K2..F..v..(.-
+    0030 - 70 e3 95 80 bc dd af 40-e6 05 47 67 51 9e b1 0a   p......@..GgQ...
+    0040 - 6b 6e a7 15 53 ba 07 8b-ec 92 3b d1 8c cc 83 77   kn..S.....;....w
+    0050 - 5f 83 33 ae 10 7b f4 94-0c 25 a9 e3 e6 b1 bc d7   _.3..{...%......
+    0060 - fa 33 5b 49 e3 b8 a4 d9-0a fb ef 16 a2 5b 75 b3   .3[I.........[u.
+    0070 - 33 6e d4 bf ec d3 ab 2a-0f 50 fd 94 a1 37 e2 24   3n.....*.P...7.$
+    0080 - 85 da 2a 7b f2 80 40 0c-6d a9 7d 4c e1 c6 d2 80   ..*{..@.m.}L....
+    0090 - 9c 06 5f 36 76 04 11 61-67 df 74 7f e9 e6 27 cc   .._6v..ag.t...'.
+    00a0 - 99 07 db ee 1e 1b a6 84-c8 37 87 87 01 40 45 cd   .........7...@E.
+    00b0 - 90 6a 40 97 2b df 17 ac-d5 da c3 5e 74 b5 2f ca   .j@.+......^t./.
+    00c0 - bf 12 29 be a7 1d c2 af-16 54 a9 df 40 1d 28 4d   ..)......T..@.(M
+
+    Start Time: 1732350020
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+---
+Post-Handshake New Session Ticket arrived:
+SSL-Session:
+    Protocol  : TLSv1.3
+    Cipher    : TLS_AES_256_GCM_SHA384
+    Session-ID: F956D4DC78F7CEE8859EE8DE6B6A3D608E8283D08141CEEA9D98635F45F12B5B
+    Session-ID-ctx: 
+    Resumption PSK: FE002C5339F5A21A4B490174F36B11BFDD8B2F864C41D124066E3654F6BE7F3EF2CCAC9D0CFCA5D01D9AF0CF7026C1C5
+    PSK identity: None
+    PSK identity hint: None
+    SRP username: None
+    TLS session ticket lifetime hint: 7200 (seconds)
+    TLS session ticket:
+    0000 - 08 72 9b 9c 71 22 2e 4a-04 4a a6 8d e9 51 b8 3e   .r..q".J.J...Q.>
+    0010 - db c6 5e 32 62 28 57 54-6a 95 e5 34 df 9a 6c f6   ..^2b(WTj..4..l.
+    0020 - 7c 69 d5 82 d8 89 fd 77-7d 64 70 61 d7 bf ed 18   |i.....w}dpa....
+    0030 - f2 6b 16 67 f7 4e 42 3a-84 13 7b 9a d7 09 9f a2   .k.g.NB:..{.....
+    0040 - 17 79 e9 74 89 fb 1c 06-a8 a1 8e 91 eb e1 91 59   .y.t...........Y
+    0050 - 1b b5 77 7a 51 8d 4c 55-98 88 da c9 5e 15 65 09   ..wzQ.LU....^.e.
+    0060 - 37 20 9c b9 36 9b 9c de-2c 94 32 a5 34 21 17 2c   7 ..6...,.2.4!.,
+    0070 - 1c e2 7b 76 fc f3 74 4d-d4 d0 6b e8 7a b9 83 07   ..{v..tM..k.z...
+    0080 - 1a 28 d2 9c 66 96 09 a4-a5 57 30 5f b3 c1 67 b5   .(..f....W0_..g.
+    0090 - f7 8d 9e ed 4a 0e 00 36-68 ac 0e 40 7b cd 13 38   ....J..6h..@{..8
+    00a0 - 9a 70 96 f1 c6 b9 bf 3f-ff ee 19 8a fa 16 f9 d1   .p.....?........
+    00b0 - 8b 74 18 2a ee 7a 23 44-3b 2b cc 79 f2 1f 06 04   .t.*.z#D;+.y....
+    00c0 - 31 55 08 eb 52 34 ef 7a-4c ea 09 4c 8b 73 dd c2   1U..R4.zL..L.s..
+
+    Start Time: 1732350020
+    Timeout   : 7200 (sec)
+    Verify return code: 0 (ok)
+    Extended master secret: no
+    Max Early Data: 0
+---
+read R BLOCK
+```
+
+#### Buy certificates from Certificate Authorities
+
+> For this you have to decide the tyope of certificate
 
 #### Lets encrypt and cert bot
+
 dns record or https challange (lets encrypt)
 
 ### HTTP based validation
