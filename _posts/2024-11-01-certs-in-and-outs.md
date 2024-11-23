@@ -6,6 +6,7 @@ categories: security webdev
 ---
 
 > This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic.
+Every feedback is welcomed and appreciated 🙏🏻
 {: .prompt-info }
 
 ## Some basics
@@ -15,24 +16,24 @@ categories: security webdev
 Hashing is the process of transforming a character string to an another format using a mathematical function which makes it:
 
 - fast -> using trapdoor functions which are easy to calculate but hard to reverse e.g.: product of two prime number but finding out which two numbers were they is much much harder
-- theoriticaly unreversable
+- theoretically unreversible
 - provides the same output for the same input
-- prevents collisions -> cannot produce the same outfor for the same input
-- reduces the input size -> it devides the input to equal blocks then compress them before running the hash function
+- prevents collisions -> cannot produce the same output for for the same input
+- reduces the input size -> it divides the input to equal blocks then compress them before running the hash function
 
-Ok, but what is it good for❓
+Ok, but what is it good for?
 
 Usually hashes are sent along side with a payload/data to determine if it was tempered after the sender initially sent it to the client. But the are also used for authentication when the user's password wont be stored in the database just the **salt**ed hash itself.
 
-**Salting 🧂** is the process of concatenating an already known propery of the user to the password and hash it together. This is important to prevent [rainbow table attacks](https://www.beyondidentity.com/glossary/rainbow-table-attack) for leaked databases which contains the hashes of the user passwords.
+**Salting 🧂** is the process of concatenating an already known properly of the user to the password and hash it together. This is important to prevent [rainbow table attacks](https://www.beyondidentity.com/glossary/rainbow-table-attack) for leaked databases which contains the hashes of the user passwords.
 
-For example each certificate contains the hash fingerprint of itself and this way when client recieves it, then it can be hashed again and see if the fingerprints are matching.
+For example each certificate contains the hash fingerprint of itself and this way when client receives it, then it can be hashed again and see if the fingerprints are matching.
 
-**Peppering🌶️** is one more additional layer of security when storing hash. It is basically doing one more round of hashing but now using some shared secret which will be the same for all of the entries in the database.
+**Peppering 🌶️** is one more additional layer of security when storing hash. It is basically doing one more round of hashing but now using some shared secret which will be the same for all of the entries in the database.
 
 #### Hashing algorithms
 
-There are multiple algorithms which is used for hashing, but they have differnet characteristics. Some of them lost their reliability by proving it can create collisions when we are doing lot of hashes, or simply the computers evolved so much that the hash can be reversed because it is not using big enough prime numbers or complexity.
+There are multiple algorithms which is used for hashing, but they have different characteristics. Some of them lost their reliability by proving it can create collisions when we are doing lot of hashes, or simply the computers evolved so much that the hash can be reversed because it is not using big enough prime numbers or complexity.
 
 ##### Lets see which algo should be used in 2024
 
@@ -55,12 +56,13 @@ There are multiple algorithms which is used for hashing, but they have differnet
 
 #### Hashing best practices 💡
 
-**Never store password in the database plaintext, use a hashed and salt&peppered string preferebly using at least sha2 with multiple iterarations/work factors. This way the
+> **Never store password in the database plaintext, use a hashed and salt&peppered string preferably using at least sha2 with multiple iterations/work factors. This way the
 cracking process itself wont worth for the attacker.**
+{: .prompt-warning }
 
 ---
 
-### What is a certificate 🎫?
+###  What is a certificate? 🎫
 
 > A **certificate** or **digital certificate** is a unique, [digitally signed](https://www.computerhope.com/jargon/d/digisig.htm) document which authoritatively identifies the identity of an individual or organization. Using [public key cryptography](https://www.computerhope.com/jargon/p/pkc.htm), its authenticity can be verified to ensure that the software or website you are using is legitimate. On the Internet, a certificate is signed by a trusted [CA](https://www.computerhope.com/jargon/c/certificate-authority.htm) (certificate authority), and verified with the authority's public key. The decrypted certificate contains a verified public key of the certificate holder (website operator), with which encrypted [HTTPS](https://www.computerhope.com/jargon/h/http.htm#https) communications can be established.
 [source](https://www.computerhope.com/jargon/c/certific.htm)
@@ -73,7 +75,7 @@ So basically the certificate is a unique generated chain of characters in a spec
 Certificates are used for:
 
 - securing communication between two parties -> like ssh or http
-- prooving access rights for a server -> mutual tls (mTLS)
+- proving access rights for a server -> mutual tls (mTLS)
 - proving integrity of a document -> digitally signed pdf
 
 ## How to use certificate to secure communication?
@@ -81,21 +83,21 @@ Certificates are used for:
 > The smart people invented a system which relies on certificates to secure the data using **public-key cryptography** or in another name -> **Asymmetric cryptography**
 {: .prompt-info }
 
-### Generate the public private keypair
+### Generate the public private key pair
 
 #### Algorithms for generation and key sizes
 
-The certificates usually generated with one of the following algorythms in combination with one of the previously mentioned hashing algorythms.
+The certificates usually generated with one of the following algorithms in combination with one of the previously mentioned hashing algorithms.
 
 Key is basically a random string of bits that serves as input for cryptographic algorithms. The stronger is the key and the encryption algorithm your data is in bigger safety.
 
 - RSA
   - using big prime numbers and based on factoring trap door function, using big keys to provide security
-  - common keysize are 2048 and 4096. 2028 bit according to NIST is secure until 2030
+  - common key size are 2048 and 4096. 2028 bit according to NIST is secure until 2030
 - ECDSA (Elliptic curve)
   - based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -> using shorter keys due to it
-  - 256 bit keysize is equivalent of 3072 bit RSA keysize
-- DSA -> using discrete logaritmic properties and private key generated from the content that we want to sign -> used for ensuring file integrity and verification
+  - 256 bit key size is equivalent of 3072 bit RSA key size
+- DSA -> using discrete logarithmic properties and private key generated from the content that we want to sign -> used for ensuring file integrity and verification
 
 #### How to generate
 
@@ -258,9 +260,42 @@ coefficient:
     7a:ad:c6:7b:04:e1:83:8f
 ```
 
+Check the public key too:
+
+```bash
+openssl rsa -in public_key.pem -pubin -text -noout
+```
+
+```bash
+Public-Key: (2048 bit)
+Modulus:
+    00:bb:24:9d:47:ba:81:6d:67:40:16:02:f6:b0:fa:
+    19:84:bc:35:ed:e8:42:7a:7a:27:de:80:cc:75:2c:
+    e8:df:a9:05:bf:bf:20:1c:05:e8:52:45:ee:87:61:
+    a7:c1:93:d9:b9:b0:ad:8d:5b:93:24:4c:3e:65:e7:
+    89:33:a3:1f:5b:34:02:86:84:00:0c:c5:76:2a:7f:
+    d4:d4:0b:b2:77:cb:28:79:38:62:59:9e:ed:b2:18:
+    bb:22:c8:ec:d3:f0:c8:1e:8a:82:b3:9d:cd:69:fa:
+    62:39:53:46:ec:39:5c:b1:08:4e:ce:ae:86:d3:17:
+    0b:3d:7f:ff:b9:75:a7:c0:64:f7:12:b3:42:51:17:
+    03:cc:c9:58:11:23:c6:a1:9e:9a:c6:dd:07:62:29:
+    51:81:ec:f4:de:66:ed:62:06:78:07:14:d8:5a:ce:
+    75:ee:eb:17:87:7a:5c:b5:9c:7f:bd:4c:85:90:02:
+    57:29:4e:c4:28:a7:2f:54:d9:f2:0c:40:94:32:10:
+    d9:2c:fa:25:92:56:18:42:bd:51:5e:12:dd:e1:d8:
+    ed:35:8e:58:c4:1e:57:66:0d:2b:e0:de:92:82:f4:
+    ef:53:ad:3e:2a:93:e4:f3:d9:d7:38:92:60:dd:12:
+    83:da:c2:18:a6:d5:30:1e:2f:6e:f9:01:0c:11:7a:
+    28:83
+Exponent: 65537 (0x10001)
+```
+
+> We can see that public and private keys are just the holders of the mathematical product and properties of the key generation process.
+{: .prompt-info }
+
 #### How to use it to encrypt the communication
 
-![asymetrics flow](/assets/certs-in-and-outs/alice-bob.drawio.png){:style="display:block; margin-left:auto; margin-right:auto"}
+![asymmetric flow](/assets/certs-in-and-outs/alice-bob.drawio.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 In very oversimplified manner this happens
 
@@ -313,28 +348,28 @@ companies (i.e. subjects) bearing that subject’s public key
 ![certs-in-and-outs](/assets/certs-in-and-outs/ca.drawio.png)
 
 > Browsers first checking the website cert against the os trusted root certs then
-they are sending a request to the CRL endpoint based on the certificate CRL Enpoint field in the certificate of the website.
+they are sending a request to the CRL endpoint based on the certificate CRL Endpoint field in the certificate of the website.
 {: .prompt-tip }
 
 ![alt text](/assets/certs-in-and-outs/crl-example.png)
 
-### How new certificates can be validated? -> Chain of thrust
+### How new certificates can be validated? -> Chain of trust
 
 > Hierarchy of certificates is used to verify the validity of a certificate’s issuer. This hierarchy is known as a _chain of trust_. In a chain of trust, certificates are issued and signed by certificates that live higher up in the hierarchy.
 This way if the OS has some trusted root certificates pre installed it is easy to build a certificate hierarchy which can prove the validity of the leaf certificate.
 {: .prompt-info }
 
-#### Contains three main parts
+#### Chain of trust tree main pillars 🧱
 
 #### Trust Anchor
 
 - A public cert key named as CA cert which is trusted by both of the communicating parties, usually exists at OS level
 
-#### Intermediete Cert
+#### Intermediate Cert
 
-- you cannot issue new cert from thrusted public CA certs since you need a new layer
+- you cannot issue new cert from trusted public CA certs since you need a new layer
 - extra security to provide validation for the CA cert
-- cheaper then issueing new CA cert for every need. New CA cet is expensive because it requires special validations of the issuer company and the processes [how this CA cert private keys are stored](https://security.stackexchange.com/questions/24896/how-do-certification-authorities-store-their-private-root-keys)
+- cheaper then issuing new CA cert for every need. New CA cet is expensive because it requires special validations of the issuer company and the processes [how this CA cert private keys are stored](https://security.stackexchange.com/questions/24896/how-do-certification-authorities-store-their-private-root-keys)
 
 #### End Entity Cert / Leaf Cert
 
@@ -480,7 +515,7 @@ Data:
 ### PKCS#7 (Cryptographic Message Syntax Standard)
 
 - PKCS7 is standard used to sign and encrypt messages particularly in email communications or to sign digital documents for example emails or pdfs etc..
-- File extension: .p7b|.p7c|.p7m|.p7s
+- File extension: .p7b, .p7c, .p7m, .p7s
 - The key is not bundled in the file
 - One or more certificate packaged together but not signed or encrypted
 - The signed document cannot be read without special tools like openssl
@@ -527,22 +562,20 @@ openssl smime -verify -in signed_message.p7s -CAfile certificate.crt -inform DER
 openssl smime -sign -in message.txt -out signed_message.p7s -signer certificate.crt -inkey private.key -outform DER -nodetach
 ```
 
-## Certificate formats ☘️
+## Certificate formats 
 >
 > Certificate format is the way how the certificate is encoded, stored and which file extension is used.
 
 ### Binary encoded
->
-> Cannot be read easily without a tool.
 
 #### .DER (Distinguished Encoding Rules)
 
-- File extensions: .der|.cer
+- File extensions: .der, .cer
 - It is not a bundle format so either the key or the cert is stored in it
 - Often used by Java applications running as web servers
 - There are no human readable headers in the file
 
-##### Howto create and read it?
+##### How to create and read it?
 
 - Generate an rsa key
 
@@ -582,9 +615,9 @@ openssl rsa -in private.der -inform DER -text -noout
 
 #### PKCS#12 (Public-Key Cryptographic Standards) sometimes references as PFX
 
-- File extensions: .pfx|.p12
+- File extensions: .pfx, .p12
 - This file is encrypted and protected with a password
-- The pfx file contain multiple cryptographics objects including public key certificates, private keys, intermediete keys.
+- The pfx file contain multiple cryptographic objects including public key certificates, private keys, intermediate keys.
 - One or more certificates packed together, password-encrypted
 - Use: you want to store and transfer your private keys and cert bundles securely
 
@@ -596,7 +629,7 @@ openssl rsa -in private.der -inform DER -text -noout
 openssl genrsa -out private.key 2048
 ```
 
-- create a self signed certiface with you new key
+- create a self signed certificate with you new key
 
 ```bash
 openssl req -new -x509 -key private.key -out certificate.crt -days 365
@@ -692,18 +725,16 @@ sgeyOorZpqBCCWuvVSR2n9KsBWyUtvo5Sb9xUt2YERi5EVctWHfCFRhFXP3u6qX/
 
 ### Base64 (ASCII)
 
-> Can be read easily with text editor and cli tools
-
 #### .PEM (Privacy-Enhanced Mail)
 
-- File extensions: .pem|.crt|.cer|.key
+- File extensions: .pem, .crt, .cer, .key
 - There is no encryption to protect the keys so the owner has to transfer them securely
 - Default format for OpenSSL. Suitable for sending files as text between systems
 - Can contain multiple certs in one file by simply concatenating the key and cert
-- Certificates are sorrounded with:
+- Certificates are surrounded with:
   - -----BEGIN CERTIFICATE-----
   - -----END CERTIFICATE-----
-- Keys are sorrunded wiht:
+- Keys are surrounded with:
   - -----BEGIN RSA PRIVATE KEY-----
   - -----END RSA PRIVATE KEY-----
 - There are cases when more then one cert / key has to be included in the file like when the server does SSL termination and other intermediate cert is required to establish the full chain of trust:
@@ -775,12 +806,12 @@ openssl x509 -in combined.pem -text -noout
     - CA will ask you to put a new TXT entry under your domain name with a specific value
   - HTTP validation:
     - CA will ask you to upload a file to a specific path which can be reached through your domain like domain/.wellknown/pki-validation/
-- Send the CSR file and present the neccessary extra documentation for EV/OV validation like utility bills, public records etc..
-- CA will isssue your new certificate and send it back to you
+- Send the CSR file and present the necessary extra documentation for EV/OV validation like utility bills, public records etc..
+- CA will issue your new certificate and send it back to you
 
 #### Example to create and decode CSR
 
-(Usefull onlline tool to decode CSRs) <https://ssltools.godaddy.com/views/csrDecoder>
+(Useful online tool to decode CSRs) <https://ssltools.godaddy.com/views/csrDecoder>
 
 - generate csr
 
@@ -905,7 +936,7 @@ sudo cp rootCA.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
 ```
 
-- Okay now create or server key
+- Okay now create our server key
 
 ```bash
 openssl genrsa -out server.key 2048
@@ -1090,7 +1121,7 @@ read R BLOCK
 
 ### Option C: Let's Encrypt free Certificate Authority
 
-> Let’s Encrypt is a free, automated, and open Certificate Authority (CA) that provides SSL/TLS certificates to secure websites using ACME procotol. It simplifies the process of obtaining, installing, and renewing certificates using automation tools like Certbot.
+> Let’s Encrypt is a free, automated, and open Certificate Authority (CA) that provides SSL/TLS certificates to secure websites using ACME protocol. It simplifies the process of obtaining, installing, and renewing certificates using automation tools like Certbot.
 {: .prompt-info }
 
 #### Pros
@@ -1121,12 +1152,13 @@ I prefer using this method since it only requires that you delegate your domain 
 
 The process itself is quite simple:
 
-- ensure you have set the dns serverat your dns registrator to cloudflare [LINK](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/
+- ensure you have set the dns server at your dns registrar to cloudflare [LINK](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/
 )
 - create cloudflare api token [LINK](https://developers.cloudflare.com/fundamentals/api/get-started/create-token/)
 
 > After this you can start an example docker compose project which will retrieve ssl certs for your domain using your token
 Use [this repository as example](https://github.com/dtap001/example-webapp-with-traefik-and-ssl)
+{: .prompt-tip }
 
 ---
 
@@ -1135,6 +1167,7 @@ Use [this repository as example](https://github.com/dtap001/example-webapp-with-
 TLS, short for Transport Layer Security, and [SSL](https://kinsta.com/knowledge/base/how-ssl-works/), short for Secure Socket Layers, are both cryptographic protocols that encrypt data and authenticate a connection when moving data on the Internet.
 
 > Well, **TLS is actually just a more recent version of SSL**
+{: .prompt-tip }
 
 - SSL 1.0 – never publicly released due to security issues.
 - SSL 2.0 – released in 1995. Deprecated in 2011. Has known security issues.
@@ -1200,12 +1233,13 @@ ssh -vvv user@hostname
 
 ## SSL termination
 
-> SSL termination is a process of terminationg the SSL/TLS connection on the edge of your infrastructure. This way helping the management of certificates since you dont have to maintain them outside of your infrastructure's secure context. Helps to debug and trace the interservice communication. Helps to easy the load pressure on servers since they dont have to deal with encryption.  SSL termination is usally done in the main ingress for your services.
+> SSL termination is a process of terminating the SSL/TLS connection on the edge of your infrastructure. This way helping the management of certificates since you don't have to maintain them outside of your infrastructure's secure context. Helps to debug and trace the interservice communication. Helps to easy the load pressure on servers since they don't have to deal with encryption.  SSL termination is usually done in the main ingress for your services.
+{: .prompt-info }
 
 ## Mutual TLS
 
 > It is an extension for TLS protocol which make possible that both parties authenticate to each other during the handshake process. 
-
+{: .prompt-info }
 
 mTLS handshake process:
 
@@ -1249,14 +1283,14 @@ openssl genpkey -algorithm RSA -out ca.key -aes256
 openssl req -key ca.key -new -x509 -out ca.crt
 ```
 
-- Trust the new CA 
+- Trust the new CA
 
 ```bash
 sudo cp ca.crt /usr/local/share/ca-certificates/
 sudo update-ca-certificates
 ```
 
-#### Server 
+#### Server
 
 - Create the server key
 
@@ -1276,7 +1310,7 @@ openssl req -key server.key -new -out server.csr
 openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 365
 ```
 
-#### Client 
+#### Client
 
 - Create the client key
 
@@ -1363,6 +1397,7 @@ You can see the connection is properly created with the client certs
 * TLSv1.2 (IN), TLS header, Supplemental data (23):
 * TLSv1.3 (IN), TLS handshake, Newsession Ticket (4):
 ```
+
 However when you try it without client cert it fails:
 
 ```bash

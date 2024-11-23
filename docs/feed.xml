@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/techie-tales/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/techie-tales/" rel="alternate" type="text/html" hreflang="en" /><updated>2024-11-23T13:12:45+01:00</updated><id>http://localhost:4000/techie-tales/feed.xml</id><title type="html">Techie Tales 🔥</title><subtitle>This is the blog of my noteworthy technical journeys and adventures as a developer and techlead.</subtitle><entry><title type="html">Certificates in and outs</title><link href="http://localhost:4000/techie-tales/posts/certs-in-and-outs/" rel="alternate" type="text/html" title="Certificates in and outs" /><published>2024-11-01T10:32:20+01:00</published><updated>2024-11-23T13:12:03+01:00</updated><id>http://localhost:4000/techie-tales/posts/certs-in-and-outs</id><content type="html" xml:base="http://localhost:4000/techie-tales/posts/certs-in-and-outs/"><![CDATA[<blockquote class="prompt-info">
-  <p>This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.4">Jekyll</generator><link href="http://localhost:4000/techie-tales/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/techie-tales/" rel="alternate" type="text/html" hreflang="en" /><updated>2024-11-23T14:19:55+01:00</updated><id>http://localhost:4000/techie-tales/feed.xml</id><title type="html">Techie Tales 🔥</title><subtitle>This is the blog of my noteworthy technical journeys and adventures as a developer and techlead.</subtitle><entry><title type="html">Certificates in and outs</title><link href="http://localhost:4000/techie-tales/posts/certs-in-and-outs/" rel="alternate" type="text/html" title="Certificates in and outs" /><published>2024-11-01T10:32:20+01:00</published><updated>2024-11-23T13:21:50+01:00</updated><id>http://localhost:4000/techie-tales/posts/certs-in-and-outs</id><content type="html" xml:base="http://localhost:4000/techie-tales/posts/certs-in-and-outs/"><![CDATA[<blockquote class="prompt-info">
+  <p>This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic.
+Every feedback is welcomed and appreciated 🙏🏻</p>
 </blockquote>
 
 <h2 id="some-basics">Some basics</h2>
@@ -10,25 +11,25 @@
 
 <ul>
   <li>fast -&gt; using trapdoor functions which are easy to calculate but hard to reverse e.g.: product of two prime number but finding out which two numbers were they is much much harder</li>
-  <li>theoriticaly unreversable</li>
+  <li>theoretically unreversible</li>
   <li>provides the same output for the same input</li>
-  <li>prevents collisions -&gt; cannot produce the same outfor for the same input</li>
-  <li>reduces the input size -&gt; it devides the input to equal blocks then compress them before running the hash function</li>
+  <li>prevents collisions -&gt; cannot produce the same output for for the same input</li>
+  <li>reduces the input size -&gt; it divides the input to equal blocks then compress them before running the hash function</li>
 </ul>
 
-<p>Ok, but what is it good for❓</p>
+<p>Ok, but what is it good for?</p>
 
 <p>Usually hashes are sent along side with a payload/data to determine if it was tempered after the sender initially sent it to the client. But the are also used for authentication when the user’s password wont be stored in the database just the <strong>salt</strong>ed hash itself.</p>
 
-<p><strong>Salting 🧂</strong> is the process of concatenating an already known propery of the user to the password and hash it together. This is important to prevent <a href="https://www.beyondidentity.com/glossary/rainbow-table-attack">rainbow table attacks</a> for leaked databases which contains the hashes of the user passwords.</p>
+<p><strong>Salting 🧂</strong> is the process of concatenating an already known properly of the user to the password and hash it together. This is important to prevent <a href="https://www.beyondidentity.com/glossary/rainbow-table-attack">rainbow table attacks</a> for leaked databases which contains the hashes of the user passwords.</p>
 
-<p>For example each certificate contains the hash fingerprint of itself and this way when client recieves it, then it can be hashed again and see if the fingerprints are matching.</p>
+<p>For example each certificate contains the hash fingerprint of itself and this way when client receives it, then it can be hashed again and see if the fingerprints are matching.</p>
 
-<p><strong>Peppering🌶️</strong> is one more additional layer of security when storing hash. It is basically doing one more round of hashing but now using some shared secret which will be the same for all of the entries in the database.</p>
+<p><strong>Peppering 🌶️</strong> is one more additional layer of security when storing hash. It is basically doing one more round of hashing but now using some shared secret which will be the same for all of the entries in the database.</p>
 
 <h4 id="hashing-algorithms">Hashing algorithms</h4>
 
-<p>There are multiple algorithms which is used for hashing, but they have differnet characteristics. Some of them lost their reliability by proving it can create collisions when we are doing lot of hashes, or simply the computers evolved so much that the hash can be reversed because it is not using big enough prime numbers or complexity.</p>
+<p>There are multiple algorithms which is used for hashing, but they have different characteristics. Some of them lost their reliability by proving it can create collisions when we are doing lot of hashes, or simply the computers evolved so much that the hash can be reversed because it is not using big enough prime numbers or complexity.</p>
 
 <h5 id="lets-see-which-algo-should-be-used-in-2024">Lets see which algo should be used in 2024</h5>
 
@@ -161,12 +162,14 @@
 
 <h4 id="hashing-best-practices-">Hashing best practices 💡</h4>
 
-<p><strong>Never store password in the database plaintext, use a hashed and salt&amp;peppered string preferebly using at least sha2 with multiple iterarations/work factors. This way the
+<blockquote class="prompt-warning">
+  <p><strong>Never store password in the database plaintext, use a hashed and salt&amp;peppered string preferably using at least sha2 with multiple iterations/work factors. This way the
 cracking process itself wont worth for the attacker.</strong></p>
+</blockquote>
 
 <hr />
 
-<h3 id="what-is-a-certificate-">What is a certificate 🎫?</h3>
+<h3 id="what-is-a-certificate-">What is a certificate? 🎫</h3>
 
 <blockquote class="prompt-info">
   <p>A <strong>certificate</strong> or <strong>digital certificate</strong> is a unique, <a href="https://www.computerhope.com/jargon/d/digisig.htm">digitally signed</a> document which authoritatively identifies the identity of an individual or organization. Using <a href="https://www.computerhope.com/jargon/p/pkc.htm">public key cryptography</a>, its authenticity can be verified to ensure that the software or website you are using is legitimate. On the Internet, a certificate is signed by a trusted <a href="https://www.computerhope.com/jargon/c/certificate-authority.htm">CA</a> (certificate authority), and verified with the authority’s public key. The decrypted certificate contains a verified public key of the certificate holder (website operator), with which encrypted <a href="https://www.computerhope.com/jargon/h/http.htm#https">HTTPS</a> communications can be established.
@@ -181,7 +184,7 @@ cracking process itself wont worth for the attacker.</strong></p>
 
 <ul>
   <li>securing communication between two parties -&gt; like ssh or http</li>
-  <li>prooving access rights for a server -&gt; mutual tls (mTLS)</li>
+  <li>proving access rights for a server -&gt; mutual tls (mTLS)</li>
   <li>proving integrity of a document -&gt; digitally signed pdf</li>
 </ul>
 
@@ -191,11 +194,11 @@ cracking process itself wont worth for the attacker.</strong></p>
   <p>The smart people invented a system which relies on certificates to secure the data using <strong>public-key cryptography</strong> or in another name -&gt; <strong>Asymmetric cryptography</strong></p>
 </blockquote>
 
-<h3 id="generate-the-public-private-keypair">Generate the public private keypair</h3>
+<h3 id="generate-the-public-private-key-pair">Generate the public private key pair</h3>
 
 <h4 id="algorithms-for-generation-and-key-sizes">Algorithms for generation and key sizes</h4>
 
-<p>The certificates usually generated with one of the following algorythms in combination with one of the previously mentioned hashing algorythms.</p>
+<p>The certificates usually generated with one of the following algorithms in combination with one of the previously mentioned hashing algorithms.</p>
 
 <p>Key is basically a random string of bits that serves as input for cryptographic algorithms. The stronger is the key and the encryption algorithm your data is in bigger safety.</p>
 
@@ -203,16 +206,16 @@ cracking process itself wont worth for the attacker.</strong></p>
   <li>RSA
     <ul>
       <li>using big prime numbers and based on factoring trap door function, using big keys to provide security</li>
-      <li>common keysize are 2048 and 4096. 2028 bit according to NIST is secure until 2030</li>
+      <li>common key size are 2048 and 4096. 2028 bit according to NIST is secure until 2030</li>
     </ul>
   </li>
   <li>ECDSA (Elliptic curve)
     <ul>
       <li>based on mathematical properties of elliptic curves from which next point can be calculated easily (public key), but reversing it almost impossible -&gt; using shorter keys due to it</li>
-      <li>256 bit keysize is equivalent of 3072 bit RSA keysize</li>
+      <li>256 bit key size is equivalent of 3072 bit RSA key size</li>
     </ul>
   </li>
-  <li>DSA -&gt; using discrete logaritmic properties and private key generated from the content that we want to sign -&gt; used for ensuring file integrity and verification</li>
+  <li>DSA -&gt; using discrete logarithmic properties and private key generated from the content that we want to sign -&gt; used for ensuring file integrity and verification</li>
 </ul>
 
 <h4 id="how-to-generate">How to generate</h4>
@@ -507,9 +510,63 @@ coefficient:
     7a:ad:c6:7b:04:e1:83:8f
 </pre></td></tr></tbody></table></code></pre></div></div>
 
+<p>Check the public key too:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>openssl rsa <span class="nt">-in</span> public_key.pem <span class="nt">-pubin</span> <span class="nt">-text</span> <span class="nt">-noout</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+</pre></td><td class="rouge-code"><pre>Public-Key: <span class="o">(</span>2048 bit<span class="o">)</span>
+Modulus:
+    00:bb:24:9d:47:ba:81:6d:67:40:16:02:f6:b0:fa:
+    19:84:bc:35:ed:e8:42:7a:7a:27:de:80:cc:75:2c:
+    e8:df:a9:05:bf:bf:20:1c:05:e8:52:45:ee:87:61:
+    a7:c1:93:d9:b9:b0:ad:8d:5b:93:24:4c:3e:65:e7:
+    89:33:a3:1f:5b:34:02:86:84:00:0c:c5:76:2a:7f:
+    d4:d4:0b:b2:77:cb:28:79:38:62:59:9e:ed:b2:18:
+    bb:22:c8:ec:d3:f0:c8:1e:8a:82:b3:9d:cd:69:fa:
+    62:39:53:46:ec:39:5c:b1:08:4e:ce:ae:86:d3:17:
+    0b:3d:7f:ff:b9:75:a7:c0:64:f7:12:b3:42:51:17:
+    03:cc:c9:58:11:23:c6:a1:9e:9a:c6:dd:07:62:29:
+    51:81:ec:f4:de:66:ed:62:06:78:07:14:d8:5a:ce:
+    75:ee:eb:17:87:7a:5c:b5:9c:7f:bd:4c:85:90:02:
+    57:29:4e:c4:28:a7:2f:54:d9:f2:0c:40:94:32:10:
+    d9:2c:fa:25:92:56:18:42:bd:51:5e:12:dd:e1:d8:
+    ed:35:8e:58:c4:1e:57:66:0d:2b:e0:de:92:82:f4:
+    ef:53:ad:3e:2a:93:e4:f3:d9:d7:38:92:60:dd:12:
+    83:da:c2:18:a6:d5:30:1e:2f:6e:f9:01:0c:11:7a:
+    28:83
+Exponent: 65537 <span class="o">(</span>0x10001<span class="o">)</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<blockquote class="prompt-info">
+  <p>We can see that public and private keys are just the holders of the mathematical product and properties of the key generation process.</p>
+</blockquote>
+
 <h4 id="how-to-use-it-to-encrypt-the-communication">How to use it to encrypt the communication</h4>
 
-<p><img src="/assets/certs-in-and-outs/alice-bob.drawio.png" alt="asymetrics flow" style="display:block; margin-left:auto; margin-right:auto" /></p>
+<p><img src="/assets/certs-in-and-outs/alice-bob.drawio.png" alt="asymmetric flow" style="display:block; margin-left:auto; margin-right:auto" /></p>
 
 <p>In very oversimplified manner this happens</p>
 
@@ -591,19 +648,19 @@ companies (i.e. subjects) bearing that subject’s public key</li>
 
 <blockquote class="prompt-tip">
   <p>Browsers first checking the website cert against the os trusted root certs then
-they are sending a request to the CRL endpoint based on the certificate CRL Enpoint field in the certificate of the website.</p>
+they are sending a request to the CRL endpoint based on the certificate CRL Endpoint field in the certificate of the website.</p>
 </blockquote>
 
 <p><img src="/assets/certs-in-and-outs/crl-example.png" alt="alt text" /></p>
 
-<h3 id="how-new-certificates-can-be-validated---chain-of-thrust">How new certificates can be validated? -&gt; Chain of thrust</h3>
+<h3 id="how-new-certificates-can-be-validated---chain-of-trust">How new certificates can be validated? -&gt; Chain of trust</h3>
 
 <blockquote class="prompt-info">
   <p>Hierarchy of certificates is used to verify the validity of a certificate’s issuer. This hierarchy is known as a <em>chain of trust</em>. In a chain of trust, certificates are issued and signed by certificates that live higher up in the hierarchy.
 This way if the OS has some trusted root certificates pre installed it is easy to build a certificate hierarchy which can prove the validity of the leaf certificate.</p>
 </blockquote>
 
-<h4 id="contains-three-main-parts">Contains three main parts</h4>
+<h4 id="chain-of-trust-tree-main-pillars-">Chain of trust tree main pillars 🧱</h4>
 
 <h4 id="trust-anchor">Trust Anchor</h4>
 
@@ -611,12 +668,12 @@ This way if the OS has some trusted root certificates pre installed it is easy t
   <li>A public cert key named as CA cert which is trusted by both of the communicating parties, usually exists at OS level</li>
 </ul>
 
-<h4 id="intermediete-cert">Intermediete Cert</h4>
+<h4 id="intermediate-cert">Intermediate Cert</h4>
 
 <ul>
-  <li>you cannot issue new cert from thrusted public CA certs since you need a new layer</li>
+  <li>you cannot issue new cert from trusted public CA certs since you need a new layer</li>
   <li>extra security to provide validation for the CA cert</li>
-  <li>cheaper then issueing new CA cert for every need. New CA cet is expensive because it requires special validations of the issuer company and the processes <a href="https://security.stackexchange.com/questions/24896/how-do-certification-authorities-store-their-private-root-keys">how this CA cert private keys are stored</a></li>
+  <li>cheaper then issuing new CA cert for every need. New CA cet is expensive because it requires special validations of the issuer company and the processes <a href="https://security.stackexchange.com/questions/24896/how-do-certification-authorities-store-their-private-root-keys">how this CA cert private keys are stored</a></li>
 </ul>
 
 <h4 id="end-entity-cert--leaf-cert">End Entity Cert / Leaf Cert</h4>
@@ -861,18 +918,7 @@ This way if the OS has some trusted root certificates pre installed it is easy t
 
 <ul>
   <li>PKCS7 is standard used to sign and encrypt messages particularly in email communications or to sign digital documents for example emails or pdfs etc..</li>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>File extension: .p7b</td>
-          <td>.p7c</td>
-          <td>.p7m</td>
-          <td>.p7s</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li>File extension: .p7b, .p7c, .p7m, .p7s</li>
   <li>The key is not bundled in the file</li>
   <li>One or more certificate packaged together but not signed or encrypted</li>
   <li>The signed document cannot be read without special tools like openssl</li>
@@ -932,37 +978,24 @@ This way if the OS has some trusted root certificates pre installed it is easy t
 </pre></td><td class="rouge-code"><pre>openssl smime <span class="nt">-sign</span> <span class="nt">-in</span> message.txt <span class="nt">-out</span> signed_message.p7s <span class="nt">-signer</span> certificate.crt <span class="nt">-inkey</span> private.key <span class="nt">-outform</span> DER <span class="nt">-nodetach</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<h2 id="certificate-formats-️">Certificate formats ☘️</h2>
+<h2 id="certificate-formats">Certificate formats</h2>
 <blockquote>
 
   <p>Certificate format is the way how the certificate is encoded, stored and which file extension is used.</p>
 </blockquote>
 
 <h3 id="binary-encoded">Binary encoded</h3>
-<blockquote>
-
-  <p>Cannot be read easily without a tool.</p>
-</blockquote>
 
 <h4 id="der-distinguished-encoding-rules">.DER (Distinguished Encoding Rules)</h4>
 
 <ul>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>File extensions: .der</td>
-          <td>.cer</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li>File extensions: .der, .cer</li>
   <li>It is not a bundle format so either the key or the cert is stored in it</li>
   <li>Often used by Java applications running as web servers</li>
   <li>There are no human readable headers in the file</li>
 </ul>
 
-<h5 id="howto-create-and-read-it">Howto create and read it?</h5>
+<h5 id="how-to-create-and-read-it">How to create and read it?</h5>
 
 <ul>
   <li>Generate an rsa key</li>
@@ -1011,23 +1044,14 @@ This way if the OS has some trusted root certificates pre installed it is easy t
 <h4 id="pkcs12-public-key-cryptographic-standards-sometimes-references-as-pfx">PKCS#12 (Public-Key Cryptographic Standards) sometimes references as PFX</h4>
 
 <ul>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>File extensions: .pfx</td>
-          <td>.p12</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li>File extensions: .pfx, .p12</li>
   <li>This file is encrypted and protected with a password</li>
-  <li>The pfx file contain multiple cryptographics objects including public key certificates, private keys, intermediete keys.</li>
+  <li>The pfx file contain multiple cryptographic objects including public key certificates, private keys, intermediate keys.</li>
   <li>One or more certificates packed together, password-encrypted</li>
   <li>Use: you want to store and transfer your private keys and cert bundles securely</li>
 </ul>
 
-<h5 id="how-to-create-and-read-it">How to create and read it?</h5>
+<h5 id="how-to-create-and-read-it-1">How to create and read it?</h5>
 
 <ul>
   <li>generate the private key</li>
@@ -1038,7 +1062,7 @@ This way if the OS has some trusted root certificates pre installed it is easy t
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li>create a self signed certiface with you new key</li>
+  <li>create a self signed certificate with you new key</li>
 </ul>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -1205,35 +1229,20 @@ sgeyOorZpqBCCWuvVSR2n9KsBWyUtvo5Sb9xUt2YERi5EVctWHfCFRhFXP3u6qX/
 
 <h3 id="base64-ascii">Base64 (ASCII)</h3>
 
-<blockquote>
-  <p>Can be read easily with text editor and cli tools</p>
-</blockquote>
-
 <h4 id="pem-privacy-enhanced-mail">.PEM (Privacy-Enhanced Mail)</h4>
 
 <ul>
-  <li>
-    <table>
-      <tbody>
-        <tr>
-          <td>File extensions: .pem</td>
-          <td>.crt</td>
-          <td>.cer</td>
-          <td>.key</td>
-        </tr>
-      </tbody>
-    </table>
-  </li>
+  <li>File extensions: .pem, .crt, .cer, .key</li>
   <li>There is no encryption to protect the keys so the owner has to transfer them securely</li>
   <li>Default format for OpenSSL. Suitable for sending files as text between systems</li>
   <li>Can contain multiple certs in one file by simply concatenating the key and cert</li>
-  <li>Certificates are sorrounded with:
+  <li>Certificates are surrounded with:
     <ul>
       <li>—–BEGIN CERTIFICATE—–</li>
       <li>—–END CERTIFICATE—–</li>
     </ul>
   </li>
-  <li>Keys are sorrunded wiht:
+  <li>Keys are surrounded with:
     <ul>
       <li>—–BEGIN RSA PRIVATE KEY—–</li>
       <li>—–END RSA PRIVATE KEY—–</li>
@@ -1346,13 +1355,13 @@ sgeyOorZpqBCCWuvVSR2n9KsBWyUtvo5Sb9xUt2YERi5EVctWHfCFRhFXP3u6qX/
       </li>
     </ul>
   </li>
-  <li>Send the CSR file and present the neccessary extra documentation for EV/OV validation like utility bills, public records etc..</li>
-  <li>CA will isssue your new certificate and send it back to you</li>
+  <li>Send the CSR file and present the necessary extra documentation for EV/OV validation like utility bills, public records etc..</li>
+  <li>CA will issue your new certificate and send it back to you</li>
 </ul>
 
 <h4 id="example-to-create-and-decode-csr">Example to create and decode CSR</h4>
 
-<p>(Usefull onlline tool to decode CSRs) <a href="https://ssltools.godaddy.com/views/csrDecoder">https://ssltools.godaddy.com/views/csrDecoder</a></p>
+<p>(Useful online tool to decode CSRs) <a href="https://ssltools.godaddy.com/views/csrDecoder">https://ssltools.godaddy.com/views/csrDecoder</a></p>
 
 <ul>
   <li>generate csr</li>
@@ -1558,7 +1567,7 @@ trusted root cert store, then create a CSR which will be signed by our root CA c
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li>Okay now create or server key</li>
+  <li>Okay now create our server key</li>
 </ul>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -1894,7 +1903,7 @@ read R BLOCK
 <h3 id="option-c-lets-encrypt-free-certificate-authority">Option C: Let’s Encrypt free Certificate Authority</h3>
 
 <blockquote class="prompt-info">
-  <p>Let’s Encrypt is a free, automated, and open Certificate Authority (CA) that provides SSL/TLS certificates to secure websites using ACME procotol. It simplifies the process of obtaining, installing, and renewing certificates using automation tools like Certbot.</p>
+  <p>Let’s Encrypt is a free, automated, and open Certificate Authority (CA) that provides SSL/TLS certificates to secure websites using ACME protocol. It simplifies the process of obtaining, installing, and renewing certificates using automation tools like Certbot.</p>
 </blockquote>
 
 <h4 id="pros">Pros</h4>
@@ -1933,11 +1942,11 @@ read R BLOCK
 <p>The process itself is quite simple:</p>
 
 <ul>
-  <li>ensure you have set the dns serverat your dns registrator to cloudflare <a href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/">LINK</a></li>
+  <li>ensure you have set the dns server at your dns registrar to cloudflare <a href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/">LINK</a></li>
   <li>create cloudflare api token <a href="https://developers.cloudflare.com/fundamentals/api/get-started/create-token/">LINK</a></li>
 </ul>
 
-<blockquote>
+<blockquote class="prompt-tip">
   <p>After this you can start an example docker compose project which will retrieve ssl certs for your domain using your token
 Use <a href="https://github.com/dtap001/example-webapp-with-traefik-and-ssl">this repository as example</a></p>
 </blockquote>
@@ -1948,7 +1957,7 @@ Use <a href="https://github.com/dtap001/example-webapp-with-traefik-and-ssl">thi
 
 <p>TLS, short for Transport Layer Security, and <a href="https://kinsta.com/knowledge/base/how-ssl-works/">SSL</a>, short for Secure Socket Layers, are both cryptographic protocols that encrypt data and authenticate a connection when moving data on the Internet.</p>
 
-<blockquote>
+<blockquote class="prompt-tip">
   <p>Well, <strong>TLS is actually just a more recent version of SSL</strong></p>
 </blockquote>
 
@@ -2040,13 +2049,13 @@ only the request part of the http</p>
 
 <h2 id="ssl-termination">SSL termination</h2>
 
-<blockquote>
-  <p>SSL termination is a process of terminationg the SSL/TLS connection on the edge of your infrastructure. This way helping the management of certificates since you dont have to maintain them outside of your infrastructure’s secure context. Helps to debug and trace the interservice communication. Helps to easy the load pressure on servers since they dont have to deal with encryption.  SSL termination is usally done in the main ingress for your services.</p>
+<blockquote class="prompt-info">
+  <p>SSL termination is a process of terminating the SSL/TLS connection on the edge of your infrastructure. This way helping the management of certificates since you don’t have to maintain them outside of your infrastructure’s secure context. Helps to debug and trace the interservice communication. Helps to easy the load pressure on servers since they don’t have to deal with encryption.  SSL termination is usually done in the main ingress for your services.</p>
 </blockquote>
 
 <h2 id="mutual-tls">Mutual TLS</h2>
 
-<blockquote>
+<blockquote class="prompt-info">
   <p>It is an extension for TLS protocol which make possible that both parties authenticate to each other during the handshake process.</p>
 </blockquote>
 
@@ -2297,6 +2306,7 @@ only the request part of the http</p>
 <span class="k">*</span> TLSv1.2 <span class="o">(</span>IN<span class="o">)</span>, TLS header, Supplemental data <span class="o">(</span>23<span class="o">)</span>:
 <span class="k">*</span> TLSv1.3 <span class="o">(</span>IN<span class="o">)</span>, TLS handshake, Newsession Ticket <span class="o">(</span>4<span class="o">)</span>:
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>However when you try it without client cert it fails:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -2395,4 +2405,4 @@ only the request part of the http</p>
 <span class="k">*</span> OpenSSL SSL_read: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
 <span class="k">*</span> Closing connection 0
 curl: <span class="o">(</span>56<span class="o">)</span> OpenSSL SSL_read: error:0A00045C:SSL routines::tlsv13 alert certificate required, errno 0
-</pre></td></tr></tbody></table></code></pre></div></div>]]></content><author><name></name></author><category term="security" /><category term="webdev" /><summary type="html"><![CDATA[This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic.]]></summary></entry></feed>
+</pre></td></tr></tbody></table></code></pre></div></div>]]></content><author><name></name></author><category term="security" /><category term="webdev" /><summary type="html"><![CDATA[This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic. Every feedback is welcomed and appreciated 🙏🏻]]></summary></entry></feed>

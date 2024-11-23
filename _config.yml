@@ -22,7 +22,7 @@ description: >-
 baseurl: "/techie-tales" # the subpath of your site, e.g. /blog
 url: "dtap001.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 github_username: dtap001
-tagline: David Tapai @ Techlead
+tagline: David Tapai - Techlead @ Elevate Healthcare
 
 github:
   username: dtap001 # change to your GitHub username
