@@ -17,8 +17,8 @@ Hashing is the process of transforming a character string to an another format u
 
 - fast -> using trapdoor functions which are easy to calculate but hard to reverse e.g.: product of two prime number but finding out which two numbers were they is much much harder
 - theoretically unreversible
-- provides the same output for the same input
-- prevents collisions -> cannot produce the same output for for the same input
+- provides the same output for the same input meaning A always will produce B
+- prevents collisions -> cannot produce the same output for for the different input meaning A -> B but C never will produce C
 - reduces the input size -> it divides the input to equal blocks then compress them before running the hash function
 
 Ok, but what is it good for?
