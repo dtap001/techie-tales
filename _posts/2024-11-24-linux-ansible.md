@@ -46,11 +46,11 @@ Since I have been working on my current workplace the need for an unix based os 
 
 ## One of the dead ends 💀
 
-After quick googling [NixOS](https://nixos.org/) seemed the perfect solution with its declarative nature, but after a couple of days of struggling the initial euphoria has faded away. I reached a point where configuring anything differently from the already available examples were a huge challenge. [This is the memento of my attempt.](https://github.com/dtap001/nix-config)
+After quick googling [NixOS](/assets/linux-ansible/https://nixos.org/) seemed the perfect solution with its declarative nature, but after a couple of days of struggling the initial euphoria has faded away. I reached a point where configuring anything differently from the already available examples were a huge challenge. [This is the memento of my attempt.](/assets/linux-ansible/https://github.com/dtap001/nix-config)
 
 ## The working solution
 
-> **Ubuntu 22/24 installed on a LUKS protected ZFS filesystem and configured by Ansible from a version controlled repository.**
+> **Ubuntu 24** installed on a **LUKS** protected **ZFS** filesystem and configured by **Ansible** from **GIT** repository.
 {: .prompt-info }
 
 ### Ubuntu
@@ -71,9 +71,9 @@ Ansible is an open-source automation tool used for configuration management, app
 
 ## How to have a similar fantastic setup like me? 🚀
 
-- download ubuntu 24 LTS from [here](https://ubuntu.com/download/desktop)
-- create an installer pendrive with [balenaEtcher](https://etcher.balena.io/)
-- boot from the pendrive
+- download ubuntu 24 LTS from [here](/assets/linux-ansible/https://ubuntu.com/download/desktop)
+- create an installer USB disk with [balenaEtcher](/assets/linux-ansible/https://etcher.balena.io/)
+- boot from the USB disk
 - in the installer:
   - choose interactive installation
   - choose extended selection for app install
@@ -81,9 +81,29 @@ Ansible is an open-source automation tool used for configuration management, app
     - select download install support for additional media formats
   - How do you want to install Ubuntu? -> select advanced features
     - erase disk and use ZFS with encryption
+- after booting in you new  install create a PAT in github [LINK](/assets/linux-ansible/https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/
+managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-token)
+- Fork this repository [LINK](/assets/linux-ansible/https://github.com/dtap001/epic-ubuntu-linux-ansible-configurator)
+- use this PAT to checkout your forked repository
 
+```bash
+    git clone https://{{ your_github_pat }}@{{ the_repository_url }} #the_repository_url ending with .git e.g.: github.com/github_username/your-forked-repo-name.git
+```
 
+- in your checkout run
 
+```bash
+./configure.sh
+```
 
-- Fork this repository [LINK]()
-- 
+- first it will ask for your new machine hostname. This hostname is important because configurations are separated based on it. This way you can have all of your machines configuration in one repository
+![input your hostname](/assets/linux-ansible/input-your-hostname.png)
+
+- after this it will ask every configuration detail. only respond with Y if the default value is OK for you
+![config](/assets/linux-ansible/config.png)
+
+- roles can be turned on and off. They contain apps and configurations for a specific purpose.
+![role](/assets/linux-ansible/role-select.png)
+
+- finally it will ask for your sudo password for tasks which requires elevated permissions
+![become-ask](/assets/linux-ansible/become-ask.png)
