@@ -23,9 +23,9 @@ Hashing is the process of transforming a character string to an another format u
 
 Ok, but what is it good for?
 
-Usually hashes are sent along side with a payload/data to determine if it was tempered after the sender initially sent it to the client. But the are also used for authentication when the user's password wont be stored in the database just the **salt**ed hash itself.
+Usually hashes are sent along side with a payload/data to determine if it was tempered after the sender initially sent it to the client. But they are also used for authentication when the user's password won't be stored in the database just the **salt**ed hash itself.
 
-**Salting 🧂** is the process of concatenating an already known properly of the user to the password and hash it together. This is important to prevent [rainbow table attacks](https://www.beyondidentity.com/glossary/rainbow-table-attack) for leaked databases which contains the hashes of the user passwords.
+**Salting 🧂** is the process of concatenating an already known property of the user to the password and hash it together. This is important to prevent [rainbow table attacks](https://www.beyondidentity.com/glossary/rainbow-table-attack) for leaked databases which contains the hashes of the user passwords.
 
 For example each certificate contains the hash fingerprint of itself and this way when client receives it, then it can be hashed again and see if the fingerprints are matching.
 
@@ -57,7 +57,7 @@ There are multiple algorithms which is used for hashing, but they have different
 #### Hashing best practices 💡
 
 > **Never store password in the database plaintext, use a hashed and salt&peppered string preferably using at least sha2 with multiple iterations/work factors. This way the
-cracking process itself wont worth for the attacker.**
+cracking process itself won't worth for the attacker.**
 {: .prompt-warning }
 
 ---

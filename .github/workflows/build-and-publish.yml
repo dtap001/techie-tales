@@ -1,8 +1,8 @@
-name: "Build and Deploy Jekyll"
+name: "Build and Publish"
 on:
   push:
-    #branches:
-    # - main
+    branches:
+      - main
     paths-ignore:
       - .gitignore
       - README.md

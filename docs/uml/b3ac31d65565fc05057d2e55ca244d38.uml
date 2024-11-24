@@ -1,7 +1,0 @@
-@startuml
-
-@startuml
-actor Client
-actor Server
-
-@enduml
