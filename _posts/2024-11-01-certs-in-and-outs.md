@@ -18,7 +18,7 @@ Hashing is the process of transforming a character string to an another format u
 - fast -> using trapdoor functions which are easy to calculate but hard to reverse e.g.: product of two prime number but finding out which two numbers were they is much much harder
 - theoretically unreversible
 - provides the same output for the same input meaning A always will produce B
-- prevents collisions -> cannot produce the same output for for the different input meaning A -> B but C never will produce C
+- prevents collisions -> cannot produce the same output for the different input meaning A -> B but C never will produce C
 - reduces the input size -> it divides the input to equal blocks then compress them before running the hash function
 
 Ok, but what is it good for?
@@ -369,7 +369,7 @@ This way if the OS has some trusted root certificates pre installed it is easy t
 
 - you cannot issue new cert from trusted public CA certs since you need a new layer
 - extra security to provide validation for the CA cert
-- cheaper then issuing new CA cert for every need. New CA cet is expensive because it requires special validations of the issuer company and the processes [how this CA cert private keys are stored](https://security.stackexchange.com/questions/24896/how-do-certification-authorities-store-their-private-root-keys)
+- cheaper then issuing new CA cert for every need. New CA cert is expensive because it requires special validations of the issuer company and the processes [how this CA cert private keys are stored](https://security.stackexchange.com/questions/24896/how-do-certification-authorities-store-their-private-root-keys)
 
 #### End Entity Cert / Leaf Cert
 
