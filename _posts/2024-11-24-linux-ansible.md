@@ -90,7 +90,14 @@ managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-tok
     git clone https://{{ your_github_pat }}@{{ the_repository_url }} #the_repository_url ending with .git e.g.: github.com/github_username/your-forked-repo-name.git
 ```
 
+## Before going any further it is the time to understand the basic terms of ansible and the structure of this repository
+
+
 - in your checkout run
+
+> It is really important to understand how this script works. It will configure the current host that is it running based on the hostname of it. So a hostname will identify a specific ansible inventory host and will be using the configuration according to that. 
+The user in the ansible playbooks will be the one that is running this script. So make sure you run it with the appropriate user.
+{: .prompt-warning }
 
 ```bash
 ./configure.sh
@@ -99,7 +106,7 @@ managing-your-personal-access-tokens#creating-a-fine-grained-personal-access-tok
 - first it will ask for your new machine hostname. This hostname is important because configurations are separated based on it. This way you can have all of your machines configuration in one repository
 ![input your hostname](/assets/linux-ansible/input-your-hostname.png)
 
-- after this it will ask every configuration detail. only respond with Y if the default value is OK for you
+- after this it will ask every configuration detail. only respond with Y if the default value is OK for you. Make sure you set the username to the same as the currently logged in user!
 ![config](/assets/linux-ansible/config.png)
 
 - roles can be turned on and off. They contain apps and configurations for a specific purpose.
