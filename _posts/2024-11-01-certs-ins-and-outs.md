@@ -295,7 +295,7 @@ Exponent: 65537 (0x10001)
 
 #### The process of securing communication with public and private keys
 
-![asymmetric flow](/assets/certs-in-and-outs/alice-bob.drawio.png){:style="display:block; margin-left:auto; margin-right:auto"}
+![asymmetric flow](/assets/certs-ins-and-outs/alice-bob.drawio.png){:style="display:block; margin-left:auto; margin-right:auto"}
 
 In a very oversimplified manner this happens:
 
@@ -346,13 +346,13 @@ companies (i.e. subjects) bearing that subject’s public key
 
 #### How browsers validate the certificate of the website?
 
-![certs-in-and-outs](/assets/certs-in-and-outs/ca.drawio.png)
+![certs-in-and-outs](/assets/certs-ins-and-outs/ca.drawio.png)
 
 > Browsers first checking the website cert against the os trusted root certs, then
 they are sending an OCSP request based on the certificate CRL Endpoint field in the certificate of the website.
 {: .prompt-tip }
 
-![alt text](/assets/certs-in-and-outs/crl-example.png)
+![alt text](/assets/certs-ins-and-outs/crl-example.png)
 
 ### How new certificates can be validated? -> Chain of trust
 
