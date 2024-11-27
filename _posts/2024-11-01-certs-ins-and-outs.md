@@ -6,7 +6,7 @@ categories: security webdev
 ---
 
 > This is my humble summary regarding every important aspect of the certificates that a developer likely will encounter. I will update this article as I learn more about this topic.
-Every feedback is welcomed and appreciated 🙏🏻
+Every feedback is welcome and appreciated 🙏🏻
 {: .prompt-info }
 
 ## Some basics
