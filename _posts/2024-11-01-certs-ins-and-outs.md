@@ -513,6 +513,13 @@ Data:
         ff:89:71:61:be:8a:16:85
 ```
 
+#### X509v3 extensions section
+
+[X509 extensions](https://docs.openssl.org/1.1.1/man5/x509v3_config/) can be used to embed more metadata into the certificate itself.  The ones which is the most interesting are:
+
+- extendedKeyUsage -> This is used to determine the possible usage of the cert. So the programs using and validating can determine if it is sufficient for their use case
+- subjectAltName -> this can include multiple domains names this way extending the original subject of the certificate. This is used for **SAN** certs.
+
 ### PKCS#7 (Cryptographic Message Syntax Standard)
 
 - PKCS7 is standard used to sign and encrypt messages particularly in email communications or to sign digital documents for example text files or pdfs etc..
